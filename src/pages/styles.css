@@ -1,0 +1,104 @@
+html,
+body {
+  font-family: "Roboto Mono", monospace;
+  background-color: black;
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+@media screen and (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+.home {
+  height: 90%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+}
+.blank-canvas {
+  top: 0;
+  height: 1000px;
+  background-color: transparent;
+}
+
+#___gatsby {
+  height: 100%;
+}
+#___gatsby > * {
+  height: 100%;
+}
+
+#test-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  /* top: 1000px; */
+  scroll-margin-top: 50px;
+  margin: auto;
+}
+
+.page-half {
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding-box;
+  background-clip: padding-box;
+  color: black;
+}
+
+p.page-half {
+  color: white;
+}
+
+.page-full {
+  width: 96%;
+  position: relative;
+  padding: 2%;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding-box;
+  background-clip: padding-box;
+  margin: auto;
+}
+
+.frame {
+  position: absolute;
+  overflow: hidden;
+  top: 5px;
+  right: 5px;
+  bottom: 5px;
+  left: 5px;
+  border: 3px solid #fff;
+  mix-blend-mode: difference;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track
+{
+	border: 1px solid black;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+::-webkit-scrollbar-thumb
+{
+	background-color: #000000;	
+}

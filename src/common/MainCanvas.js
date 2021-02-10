@@ -57,12 +57,15 @@ const MainCanvas = () => {
     greyscalePosIn: 0.1,
     greyscalePosOut: 0.6,
     pixelPosIn: 0.7,
-    pixelPosOut: 0 
+    pixelPosOut: 1 
   }
+
+  let targetScrollPos = 0;
+  let scrollPos = 0;
 
   const sobelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1.5),new THREE.Vector2(0,2),new THREE.Vector2(0,0));
   const greyscaleCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1),new THREE.Vector2(0,1),new THREE.Vector2(0,0));
-  const pixelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,2),new THREE.Vector2(0,2),new THREE.Vector2(0,1));
+  const pixelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1),new THREE.Vector2(0,1),new THREE.Vector2(0,1));
 
 
   useEffect(() => {
@@ -78,7 +81,35 @@ const MainCanvas = () => {
     initTerrain()
     initSky()
 
-    const animate = () => {
+    let then = 0;
+    const animate = (now) => {
+
+      //get delta time
+      now *= 0.001;  // make it seconds
+      let delta = now - then;
+      then = now;
+
+      // update shaders using smoothed scroll position
+      scrollPos = THREE.MathUtils.lerp( scrollPos, targetScrollPos, 0.05 );
+      // gets clamped time between in and out points
+      const sobelTime = THREE.MathUtils.smoothstep( scrollPos, transitions.sobelPosIn, transitions.sobelPosOut ) 
+      // finds that point on the animation curve
+      const sobelPos = sobelCurve.getPoint(sobelTime).y
+      params.sobelOpacity = sobelPos;
+
+      const greyscaleTime = THREE.MathUtils.smoothstep(scrollPos, transitions.greyscalePosIn, transitions.greyscalePosOut)
+      const greyscalePos = greyscaleCurve.getPoint(greyscaleTime).y;
+      params.greyscaleOpacity = greyscalePos;
+
+      // console.log(pos.toFixed(2), greyscaleTime.toFixed(2), greyscalePos.toFixed(2))
+      const pixelTime = THREE.MathUtils.smoothstep(scrollPos, transitions.pixelPosIn, transitions.pixelPosOut)
+      const pixelPos = pixelCurve.getPoint(pixelTime).y
+      const pixelSize = THREE.MathUtils.mapLinear(pixelPos, 0, 1, 1, 32)
+      params.greyscaleOpacity = pixelSize;
+
+      effectSobel.uniforms[ 'opacity' ].value = sobelPos;
+      effectGrayScale.uniforms[ 'opacity' ].value = greyscalePos;
+      effectPixel.uniforms[ "pixelSize" ].value = pixelSize;
 
       if ( params.enable === true ) {
 
@@ -108,28 +139,8 @@ const MainCanvas = () => {
   }, [])
 
   const handleScroll = () => { 
-    var pos = getVerticalScrollNormalised(document.body)
-
-    console.log("Scroll pos: "+pos.toFixed(3));
-
-    const sobelTime = THREE.MathUtils.smoothstep(pos, transitions.sobelPosIn, transitions.sobelPosOut)
-    const sobelPos = sobelCurve.getPoint(sobelTime).y
-    params.sobelOpacity = sobelPos;
-
-    const greyscaleTime = THREE.MathUtils.smoothstep(pos, transitions.greyscalePosIn, transitions.greyscalePosOut)
-    const greyscalePos = greyscaleCurve.getPoint(greyscaleTime).y;
-    params.greyscaleOpacity = greyscalePos;
-
-    // console.log(pos.toFixed(2), greyscaleTime.toFixed(2), greyscalePos.toFixed(2))
-    const pixelTime = THREE.MathUtils.smoothstep(pos, transitions.pixelPosIn, transitions.pixelPosOut)
-    const pixelPos = pixelCurve.getPoint(pixelTime).y
-    const pixelSize = THREE.MathUtils.mapLinear(pixelPos, 0, 1, 1, 32)
-    params.greyscaleOpacity = pixelSize;
-
-    effectSobel.uniforms[ 'opacity' ].value = sobelPos;
-    effectGrayScale.uniforms[ 'opacity' ].value = greyscalePos;
-    effectPixel.uniforms[ "pixelSize" ].value = pixelSize;
-
+    targetScrollPos = getVerticalScrollNormalised(document.body)
+    console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
   }
   
   const getVerticalScrollNormalised = ( elm ) => {
@@ -209,7 +220,7 @@ const MainCanvas = () => {
         var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
         var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
 
-        gui.open();
+        // gui.open();
         
         sobelOpacitySlider.onChange(function(value){
           effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;

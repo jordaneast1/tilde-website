@@ -76,7 +76,7 @@ export const Work = () => {
         <div className="page-full">
           <h2>Work</h2>
         </div>
-        <div className="frame" data-aos="fade-up"></div>
+        {/* <div className="frame" data-aos="fade-up"></div> */}
 
         <GalleryItem to="/meetingHill/" state={{ modal: true, }} >
           <h1>Meeting Hill</h1>

@@ -28,8 +28,12 @@ const seo = {
 
 const Blank = styled.section `
 width: 100%;
-height: 1000px;
-background-image:url("meetingHill.jpg");
+height: 100vh;
+`
+
+const Blank2 = styled.section `
+width: 100%;
+height: 60vh;
 `
 
 const ArrowDown = styled(Link)`
@@ -105,9 +109,10 @@ return (
     <MainCanvas />
     <Blank><ArrowDown to="/#about-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
     <About />
+    <Blank2 />
     <Work />
-    <Contact />
     <Footer />
+    <Contact />
     <Nav />
   </div>
 );}

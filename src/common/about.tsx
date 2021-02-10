@@ -47,9 +47,7 @@ export const About = () => {
   return (
     <div id="about-header" className="page" >
       <FullPage1 className="page-full" data-aos="fade-down">
-        <div
-          className="frame"
-        ></div>
+        {/* <div  className="frame"  ></div> */}
         <h1>About us</h1>
         <p>
           Holystone red ensign gabion warp lateen sail hearties bowsprit mizzen
@@ -63,10 +61,7 @@ export const About = () => {
  
 
           <HalfPage>
-          <div
-            className="frame"
-
-          ></div>
+          <div className="frame" ></div>
             <h1>Pat</h1>
             <p>
               Line loot pinnace ahoy scurvy Jolly Roger squiffy clap of thunder
@@ -80,9 +75,7 @@ export const About = () => {
 
 
           <HalfPage>
-          <div
-            className="frame"
-          ></div>
+          <div className="frame"></div>
             <ProfilePic src="/jordan.jpg"></ProfilePic>
             <h1>Jordan</h1>
             <p>

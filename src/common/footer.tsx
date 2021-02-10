@@ -9,7 +9,7 @@ const Blank = styled.section`
 export const Footer = () => {
   return (
     <div>
-        <Blank>this page would be blank if</Blank>
+        <Blank>~ this page would be blank if i were not here telling you that ~</Blank>
     </div>
   )
 }

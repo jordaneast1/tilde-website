@@ -5,6 +5,18 @@ import styled from 'styled-components'
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
+import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
+
+
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { LuminosityShaderWithOpacity } from './Shaders/LuminosityShaderWithOpacity';
+import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
+import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
+
+
+
 const StyledDiv = styled.div`
   overflow: hidden;
   position: fixed;
@@ -27,6 +39,31 @@ const MainCanvas = () => {
   let mouse = useRef()
   let target = useRef()
   let fogCol = useRef()
+  let composer = useRef()
+  let effectSobel = useRef()
+  let effectGrayScale = useRef()
+  let effectPixel = useRef();
+
+  const params = {
+    enable: true,
+    sobelOpacity: 0.0,
+    greyscaleOpacity: 0.0,
+    pixelSize: 2.0
+  };
+
+  const transitions = {
+    sobelPosIn: 0.2,
+    sobelPosOut: 0.7,
+    greyscalePosIn: 0.1,
+    greyscalePosOut: 0.6,
+    pixelPosIn: 0.7,
+    pixelPosOut: 0 
+  }
+
+  const sobelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1.5),new THREE.Vector2(0,2),new THREE.Vector2(0,0));
+  const greyscaleCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1),new THREE.Vector2(0,1),new THREE.Vector2(0,0));
+  const pixelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,2),new THREE.Vector2(0,2),new THREE.Vector2(0,1));
+
 
   useEffect(() => {
 
@@ -42,7 +79,17 @@ const MainCanvas = () => {
     initSky()
 
     const animate = () => {
-      renderer.render(scene, camera)
+
+      if ( params.enable === true ) {
+
+        composer.render();
+
+      } else {
+
+        renderer.render( scene, camera );
+
+      }
+
       shape.rotation.x += 0.01
       shape.rotation.y += 0.02
       updateSun()
@@ -60,10 +107,47 @@ const MainCanvas = () => {
     animate()
   }, [])
 
+  const handleScroll = () => { 
+    var pos = getVerticalScrollNormalised(document.body)
+
+    console.log("Scroll pos: "+pos.toFixed(3));
+
+    const sobelTime = THREE.MathUtils.smoothstep(pos, transitions.sobelPosIn, transitions.sobelPosOut)
+    const sobelPos = sobelCurve.getPoint(sobelTime).y
+    params.sobelOpacity = sobelPos;
+
+    const greyscaleTime = THREE.MathUtils.smoothstep(pos, transitions.greyscalePosIn, transitions.greyscalePosOut)
+    const greyscalePos = greyscaleCurve.getPoint(greyscaleTime).y;
+    params.greyscaleOpacity = greyscalePos;
+
+    // console.log(pos.toFixed(2), greyscaleTime.toFixed(2), greyscalePos.toFixed(2))
+    const pixelTime = THREE.MathUtils.smoothstep(pos, transitions.pixelPosIn, transitions.pixelPosOut)
+    const pixelPos = pixelCurve.getPoint(pixelTime).y
+    const pixelSize = THREE.MathUtils.mapLinear(pixelPos, 0, 1, 1, 32)
+    params.greyscaleOpacity = pixelSize;
+
+    effectSobel.uniforms[ 'opacity' ].value = sobelPos;
+    effectGrayScale.uniforms[ 'opacity' ].value = greyscalePos;
+    effectPixel.uniforms[ "pixelSize" ].value = pixelSize;
+
+  }
+  
+  const getVerticalScrollNormalised = ( elm ) => {
+    var p = elm.parentNode
+    return (elm.scrollTop || p.scrollTop) / (p.scrollHeight - p.clientHeight )
+  }
+
   const resize = () => {
     let w = threeElement.current.clientWidth
     let h = threeElement.current.clientHeight
     renderer.setSize(w, h)
+    composer.setSize( w, h);
+
+    effectSobel.uniforms[ 'resolution' ].value.x = w * window.devicePixelRatio;
+    effectSobel.uniforms[ 'resolution' ].value.y = h * window.devicePixelRatio;
+
+    effectPixel.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+
     camera.aspect = w / h
     camera.updateProjectionMatrix()
   }
@@ -87,6 +171,60 @@ const MainCanvas = () => {
       resize()
     })
     window.addEventListener( 'mousemove', onMouseMove, false );
+    window.addEventListener('scroll', handleScroll)
+
+    // postprocessing
+
+    composer = new EffectComposer( renderer );
+    const renderPass = new RenderPass( scene, camera );
+    composer.addPass( renderPass );
+
+    // color to grayscale conversion
+
+    effectGrayScale = new ShaderPass( LuminosityShaderWithOpacity );
+    effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
+
+    composer.addPass( effectGrayScale );
+
+    // you might want to use a gaussian blur filter before
+    // the next pass to improve the result of the Sobel operator
+
+    // Sobel operator
+
+    effectSobel = new ShaderPass( SobelWithOpacity );
+    effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
+    effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
+    effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
+    composer.addPass( effectSobel );
+
+    effectPixel = new ShaderPass( PixelShader );
+    effectPixel.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
+    effectPixel.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
+    composer.addPass( effectPixel );
+
+
+    const gui = new GUI();
+
+        gui.add( params, 'enable' );
+        var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
+        var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
+
+        gui.open();
+        
+        sobelOpacitySlider.onChange(function(value){
+          effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
+        });
+
+        greyscaleOpacitySlider.onChange(function(value){
+          effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
+        });
+
+        var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
+
+        pixelSlider.onChange(function(value){
+          effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
+        });
+
   }
 
   const initControls = () => {
@@ -111,11 +249,11 @@ const MainCanvas = () => {
 
   const initLights = () => {
     //lights
-    const lightA = new THREE.PointLight(0xffffff, 0.25)
+    const lightA = new THREE.PointLight(0xffffff, 1)
     lightA.position.set(500, 500, 500)
     scene.add(lightA)
 
-    const lightB = new THREE.PointLight(0xffffff, 0.25)
+    const lightB = new THREE.PointLight(0xffffff, 1)
     lightB.position.set(-500, -500, -500)
     scene.add(lightB)
   }

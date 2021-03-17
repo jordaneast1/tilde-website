@@ -7,4 +7,4 @@ Minimal Gatsby Typescript Starter [t3.gg](https://t3.gg)
 
 #### Getting started
 
-`npm install` and `gatsby develop` away
+`npm install` and `npm run develop` away

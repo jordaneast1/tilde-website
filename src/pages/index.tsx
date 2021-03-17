@@ -9,9 +9,9 @@ import { Contact } from "../common/contact";
 import Nav from "../common/Nav";
 import { Footer } from "../common/footer"
 
-import MainCanvas from "../common/MainCanvas";
 import styled from "styled-components";
 
+import MainCanvas from "../common/MainCanvas";
 
 import AOS from "aos";
 import "aos/dist/aos.css"; // You can also use <link> for styles
@@ -94,6 +94,7 @@ const home = () => {
   });
 
 
+
 return (
   <div className="home">
     <title>{seo.title}</title>
@@ -108,6 +109,7 @@ return (
     </Helmet>
     
     <MainCanvas />
+    
     <Blank><ArrowDown to="/#about-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
     <About />
     <Blank2 />

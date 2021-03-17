@@ -7,7 +7,7 @@ import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 
-import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
+// import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -214,27 +214,27 @@ const MainCanvas = () => {
     composer.addPass( effectPixel );
 
 
-    const gui = new GUI();
+    // const gui = new GUI();
 
-        gui.add( params, 'enable' );
-        var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
-        var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
+    //     gui.add( params, 'enable' );
+    //     var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
+    //     var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
 
-        // gui.open();
+    //     // gui.open();
         
-        sobelOpacitySlider.onChange(function(value){
-          effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
-        });
+    //     sobelOpacitySlider.onChange(function(value){
+    //       effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
+    //     });
 
-        greyscaleOpacitySlider.onChange(function(value){
-          effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
-        });
+    //     greyscaleOpacitySlider.onChange(function(value){
+    //       effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
+    //     });
 
-        var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
+    //     var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 
-        pixelSlider.onChange(function(value){
-          effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
-        });
+    //     pixelSlider.onChange(function(value){
+    //       effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
+    //     });
 
   }
 

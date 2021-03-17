@@ -2,10 +2,10 @@ import React from "react";
 import ModalArtworkPage from "../common/ModalArtworkPage"
 
 
-const Skate = () => {
+const SparkAR = () => {
   return (
     <ModalArtworkPage
-    title="Skate"
+    title="SparkAR"
     description={
       "Here's some stuff"
     }
@@ -13,4 +13,4 @@ const Skate = () => {
     />
   )
 }
-export default Skate;
+export default SparkAR;

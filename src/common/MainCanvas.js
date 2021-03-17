@@ -1,3 +1,4 @@
+ 
 import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { Sky } from 'three/examples/jsm/objects/Sky.js'
@@ -5,8 +6,8 @@ import styled from 'styled-components'
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
+import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -14,7 +15,6 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { LuminosityShaderWithOpacity } from './Shaders/LuminosityShaderWithOpacity';
 import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
 import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
-
 
 
 const StyledDiv = styled.div`
@@ -181,7 +181,7 @@ const MainCanvas = () => {
     window.addEventListener('resize', () => {
       resize()
     })
-    window.addEventListener( 'mousemove', onMouseMove, false );
+    // window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener('scroll', handleScroll)
 
     // postprocessing

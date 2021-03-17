@@ -4,12 +4,12 @@ import { Helmet } from "react-helmet";
 import { Link } from "gatsby";
 import "./styles.css";
 import { About } from "../common/about";
-import { Work } from "../common/work";
+import  Work  from "./Work";
 import { Contact } from "../common/contact";
 import Nav from "../common/Nav";
 import { Footer } from "../common/footer"
 
-import MainCanvas from "../common/MainCanvas.js";
+import MainCanvas from "../common/MainCanvas";
 import styled from "styled-components";
 
 
@@ -92,6 +92,7 @@ const home = () => {
       AOS.refresh();
     }
   });
+
 
 return (
   <div className="home">

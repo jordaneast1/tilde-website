@@ -2,10 +2,10 @@ import React from "react";
 import ModalArtworkPage from "../common/ModalArtworkPage"
 
 
-const Skate = () => {
+const EdgeOfThePresent = () => {
   return (
     <ModalArtworkPage
-    title="Skate"
+    title="Edge Of The Present"
     description={
       "Here's some stuff"
     }
@@ -13,4 +13,4 @@ const Skate = () => {
     />
   )
 }
-export default Skate;
+export default EdgeOfThePresent;

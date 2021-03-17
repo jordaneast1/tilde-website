@@ -2,10 +2,10 @@ import React from "react";
 import ModalArtworkPage from "../common/ModalArtworkPage"
 
 
-const Skate = () => {
+const Singularity = () => {
   return (
     <ModalArtworkPage
-    title="Skate"
+    title="Singularity"
     description={
       "Here's some stuff"
     }
@@ -13,4 +13,5 @@ const Skate = () => {
     />
   )
 }
-export default Skate;
+export default Singularity;
+    

@@ -5,7 +5,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js'
 import styled from 'styled-components'
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-
+import {FBXLoader} from 'three/examples/jsm/loaders/FBXLoader'
 
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
@@ -15,6 +15,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { LuminosityShaderWithOpacity } from './Shaders/LuminosityShaderWithOpacity';
 import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
 import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
+import { Object3D } from 'three/build/three.module'
 
 
 const StyledDiv = styled.div`
@@ -121,7 +122,7 @@ const MainCanvas = () => {
 
       }
 
-      shape.rotation.x += 0.01
+      // shape.rotation.x += 0.01
       shape.rotation.y += 0.02
       updateSun()
 
@@ -154,8 +155,8 @@ const MainCanvas = () => {
     renderer.setSize(w, h)
     composer.setSize( w, h);
 
-    effectSobel.uniforms[ 'resolution' ].value.x = w * window.devicePixelRatio;
-    effectSobel.uniforms[ 'resolution' ].value.y = h * window.devicePixelRatio;
+    effectSobel.uniforms[ 'resolution' ].value.x = w * window.devicePixelRatio * 64;
+    effectSobel.uniforms[ 'resolution' ].value.y = h * window.devicePixelRatio * 64;
 
     effectPixel.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
 
@@ -247,8 +248,8 @@ const MainCanvas = () => {
     controls.screenSpacePanning = false
     controls.enableZoom = false
 
-    controls.minDistance = 300
-    controls.maxDistance = 1000
+    controls.minDistance = 100
+    controls.maxDistance = 200
 
     controls.maxPolarAngle = Math.PI / 2
 
@@ -271,11 +272,17 @@ const MainCanvas = () => {
 
   const initGeo = () => {
     //geo
-    const geometry = new THREE.SphereGeometry(50, 20, 10)
-    const material = new THREE.MeshPhongMaterial({ flatShading: true })
-    shape = new THREE.Mesh(geometry, material)
-    shape.position.set(0,500,0)
+    shape = new Object3D();
+    const loader = new FBXLoader();
+		loader.load( '/models/TildeLogo2.fbx', function ( object ) {
+      shape.add(object)
+      const material = new THREE.MeshPhysicalMaterial({roughness:0.5, metalness: 0.5, reflectivity: 1})
+      object.material = material;
+    });
+    shape.position.set(0,200,0)
+
     scene.add(shape)
+
   }
 
   const loadPlane = () => {
@@ -441,7 +448,7 @@ const MainCanvas = () => {
     var data = generateHeight(worldWidth, worldDepth)
 
     camera.position.y =
-      data[worldHalfWidth + worldHalfDepth * worldWidth] * 10 + 500
+      data[worldHalfWidth + worldHalfDepth * worldWidth] * 1 
 
     var geometry = new THREE.PlaneBufferGeometry(
       7500,
@@ -454,7 +461,7 @@ const MainCanvas = () => {
     var vertices = geometry.attributes.position.array
 
     for (var i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
-      vertices[j + 1] = data[i] * 10
+      vertices[j + 1] = data[i] * 3
     }
 
     var texture = new THREE.CanvasTexture(

@@ -5,19 +5,23 @@ import { ModalRoutingContext } from "gatsby-plugin-modal-routing";
 
 const ArtworkPage = styled.section`
   background-color: white;
-  margin: 30px 30px 0px 30px;
-  border: 15px;
+  margin: 60px 30px 0px 30px;
 
 `
 
 const Head = styled.div`
+  margin: 0px 30px;
+`
 
+const Head2 = styled.div`
+  position: relative;
+  top: -30px;
 `
 
 const Body = styled.div`
   color: #aaa;
-  max-width: 70%;
-  margin-left:15%;
+  max-width: 80%;
+  margin-left:10%;
   h2 {
     color: black;
   }
@@ -45,10 +49,20 @@ const StyledLink = styled(Link)`
     color: black;
   }
 `
+const modalStyle = {
+  position: "absolute",
+  inset: "80px",
+  border: "1px solid rgb(204, 204, 204)",
+  background: "rgb(255, 255, 255)",
+  overflow: "auto",
+}
+
+
 
 const ModalArtworkPage = ( { title, description, imageUrls}) => (
   <ModalRoutingContext.Consumer>
     {({ modal, closeTo }) => (
+      
       <ArtworkPage>
         <Head>
         {modal ? (
@@ -56,18 +70,22 @@ const ModalArtworkPage = ( { title, description, imageUrls}) => (
             &#10006;
           </StyledLink>
         ) : (
-          <h1>
-          <StyledLink to="/">Tilde Visual</StyledLink> / <StyledLink to="/#work-header">Work</StyledLink>
-          </h1>
+          <Head2>
+            <h1>
+              <StyledLink to="/">Tilde Visual</StyledLink> / <StyledLink to="/#work-header">Work</StyledLink> / {title} ↴
+            </h1>
+          </Head2>
         )}
         </Head>
+
         <Body>
-        <h2>{title}</h2>
-        <p>{description}</p>
-        <Images>
-        {imageUrls && imageUrls.map((url, i) => <img src={url} key={i} />)}
-      </Images>
-      </Body>
+          
+          <h2>{title}</h2>
+          <p>{description}</p>
+          <Images>
+          {imageUrls && imageUrls.map((url, i) => <img src={url} key={i} />)}
+          </Images>
+        </Body>
       </ArtworkPage>
     )}
   </ModalRoutingContext.Consumer>

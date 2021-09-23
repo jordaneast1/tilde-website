@@ -7,6 +7,7 @@ import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {FBXLoader} from 'three/examples/jsm/loaders/FBXLoader'
 
+
 // import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -124,6 +125,7 @@ const MainCanvas = () => {
 
       // shape.rotation.x += 0.01
       shape.rotation.y += 0.02
+
       updateSun()
 
       //  let target = new THREE.Vector2();
@@ -141,7 +143,7 @@ const MainCanvas = () => {
 
   const handleScroll = () => { 
     targetScrollPos = getVerticalScrollNormalised(document.body)
-    console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
+    //console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
   }
   
   const getVerticalScrollNormalised = ( elm ) => {
@@ -273,15 +275,33 @@ const MainCanvas = () => {
   const initGeo = () => {
     //geo
     shape = new Object3D();
+
+    
+
     const loader = new FBXLoader();
+    const texLoader = new THREE.TextureLoader();
 		loader.load( '/models/TildeLogo2.fbx', function ( object ) {
-      shape.add(object)
-      const material = new THREE.MeshPhysicalMaterial({roughness:0.5, metalness: 0.5, reflectivity: 1})
-      object.material = material;
+      
+      const tildealbedo = texLoader.load( '/textures/tefmajbn_4K_Albedo.jpg');
+      const tilderoughness = new THREE.TextureLoader().load( '/textures/tefmajbn_4K_Roughness.jpg' );
+      // console.log(texture)
+      shape.add(object);
+      // const material = new THREE.MeshPhysicalMaterial({roughness:0.8, map:tildealbedo, metalness: 0.5, reflectivity: 0.6})
+      // object.material = material;
+      object.traverse( function ( child ) {
+
+        if ( child.isMesh ) {
+          const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color(0x4), roughness:0.9, roughnessMap: tilderoughness, map:tildealbedo, metalness: 0.3, reflectivity: 0.1})
+          child.material = material // assign your diffuse texture here
+      
+        }
+      });
     });
+    
     shape.position.set(0,200,0)
 
     scene.add(shape)
+
 
   }
 
@@ -300,7 +320,7 @@ const MainCanvas = () => {
     const planeMesh = new THREE.Mesh(geometry, planeMaterial)
     planeMesh.receiveShadow = true
     planeMesh.rotation.set(THREE.MathUtils.degToRad(90), 0, 0)
-    scene.add(planeMesh)
+    //scene.add(planeMesh)
   }
 
   const initSky = () => {
@@ -334,12 +354,13 @@ const MainCanvas = () => {
 
   const updateSun = () => {
     //day/night cycle
-    sunParameters.azimuth = (sunParameters.azimuth+0.0005)%1;
+    sunParameters.azimuth = scrollPos;//(sunParameters.azimuth+0.0002)%1;
     var t = 1 - sunParameters.azimuth;
-    //console.log(t); 
-    fogCol = new THREE.Color(t,t,t)
-    scene.fog = new THREE.FogExp2(fogCol, 0.0005)
+    // console.log(t); 
+
     
+    fogCol = new THREE.Color(scrollPos,scrollPos,scrollPos);
+    scene.fog.color.set(fogCol)
 
     var theta = Math.PI * (sunParameters.inclination - 0.5)
     var phi = 2 * Math.PI * (sunParameters.azimuth - 0.5)
@@ -475,6 +496,7 @@ const MainCanvas = () => {
       new THREE.MeshBasicMaterial({ map: texture })
     )
     scene.add(mesh)
+    mesh.position.setY(-50)
   }
 
   const onMouseMove = (event) => {

@@ -5,6 +5,14 @@ body {
   font-size: 14px;
   scroll-behavior: smooth;
 }
+/* Small screens */
+@media all and (max-width: 500px) {
+  /* On small screens, we are no longer using row direction but column */
+  body {
+    font-size: 10px;
+  }
+
+}
 @media screen and (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -18,8 +26,11 @@ body {
   justify-content: center;
 }
 
+
 .ReactModal__Content--after-open {
   inset: 80px;
+  background: #222 !important;
+
 }
 
 #___gatsby {

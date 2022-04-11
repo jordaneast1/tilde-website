@@ -5,8 +5,7 @@ import styled from "styled-components";
 
 const CenteredDiv = styled.div`
   display: flex;
-  justify-content: center;
-  width: 100%;
+  height:50vw;
 `;
 
 const MeetingHill = () => {
@@ -16,7 +15,7 @@ const MeetingHill = () => {
     imageUrls={["/meetingHill.jpg","/MeetingHillprogramming.png"]}
       description={
         <div>
-          Meeting Hill was created to be a place to share music, panels, interviews with local artists and collectives, DJ sets and other selected audio pieces.
+          Meeting Hill was created during lockdown in 2020, as a place to share music, panels, interviews with local artists and collectives, DJ sets and other selected audio pieces.
           Over the two week period, a program was broadcasted live over the internet via AzuraCast (a free online radio host), with Meeting Hill as the social and visual platform for the artists.
           <br/>
           <br/>
@@ -30,7 +29,7 @@ const MeetingHill = () => {
           <br/>
 
           <CenteredDiv>
-            <iframe src="https://player.vimeo.com/video/517996605" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+            <iframe src="https://player.vimeo.com/video/517996605" width="100%" height="auto" frameBorder="0" allow="autoplay; fullscreen; picture-in-picture" allowFullScreen ></iframe>
           </CenteredDiv>
         </div>
       }

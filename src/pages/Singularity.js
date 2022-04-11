@@ -3,9 +3,8 @@ import ModalArtworkPage from "../common/ModalArtworkPage"
 import styled from "styled-components";
 
 const CenteredDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
+display: flex;
+height:50vw;
 `;
 
 const Singularity = () => {
@@ -23,7 +22,7 @@ const Singularity = () => {
 
 
       <CenteredDiv>
-            <iframe src="https://player.vimeo.com/video/526794203" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+            <iframe src="https://player.vimeo.com/video/526794203" width="1920" height="1080" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
       </CenteredDiv>
       <br/><br/>
       <br/><br/>

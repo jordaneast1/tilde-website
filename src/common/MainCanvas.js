@@ -245,7 +245,7 @@ const MainCanvas = () => {
     controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.05
-    controls.autoRotate = true
+    controls.autoRotate = false
 
     controls.screenSpacePanning = false
     controls.enableZoom = false
@@ -276,7 +276,35 @@ const MainCanvas = () => {
     //geo
     shape = new Object3D();
 
+    const loader = new FBXLoader();
+    const texLoader = new THREE.TextureLoader();
+		loader.load( '/models/TildeLogo2.fbx', function ( object ) {
+      
+      const tildealbedo = texLoader.load( '/textures/tefmajbn_4K_Albedo.jpg');
+      const tilderoughness = new THREE.TextureLoader().load( '/textures/tefmajbn_4K_Roughness.jpg' );
+      // console.log(texture)
+      shape.add(object);
+      // const material = new THREE.MeshPhysicalMaterial({roughness:0.8, map:tildealbedo, metalness: 0.5, reflectivity: 0.6})
+      // object.material = material;
+      object.traverse( function ( child ) {
+
+        if ( child.isMesh ) {
+          const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color(0x4), roughness:0.9, roughnessMap: tilderoughness, map:tildealbedo, metalness: 0.3, reflectivity: 0.1})
+          child.material = material // assign your diffuse texture here
+      
+        }
+      });
+    });
     
+    shape.position.set(0,200,0)
+
+    scene.add(shape)
+
+  }
+
+  const initLandscape = () => {
+    //geo
+    shape = new Object3D();
 
     const loader = new FBXLoader();
     const texLoader = new THREE.TextureLoader();

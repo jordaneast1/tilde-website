@@ -1,16 +1,17 @@
 import React from "react";
+import "../pages/styles.css";
 import styled from "styled-components";
 import { Link } from "gatsby";
 import { ModalRoutingContext } from "gatsby-plugin-modal-routing";
 
-const ArtworkPage = styled.section`
-  background-color: white;
-  margin: 60px 30px 0px 30px;
 
+const ArtworkPage = styled.section`
+  background-color: #222; //should be same as .ReactModal__Content--after-open in styles.css
+  margin: 20px 20px 0px 20px;
 `
 
 const Head = styled.div`
-  margin: 0px 30px;
+  margin: 40px 20px;
 `
 
 const Head2 = styled.div`
@@ -19,14 +20,14 @@ const Head2 = styled.div`
 `
 
 const Body = styled.div`
-  color: #aaa;
+  color: #222;
   max-width: 80%;
   margin-left:10%;
   h2 {
-    color: black;
+    color: white;
   }
   p {
-    color: black;
+    color: white;
     
   }
 `
@@ -36,7 +37,7 @@ const Images = styled.div`
   flex-direction: column;
   align-items: center;
   img {
-    max-width: 70%;
+    max-width: 100%;
     margin-bottom:5px;
   }
 `;
@@ -46,16 +47,10 @@ const StyledLink = styled(Link)`
   text-decoration: none;
 
   :hover{
-    color: black;
+    color: white;
   }
 `
-const modalStyle = {
-  position: "absolute",
-  inset: "80px",
-  border: "1px solid rgb(204, 204, 204)",
-  background: "rgb(255, 255, 255)",
-  overflow: "auto",
-}
+
 
 
 

@@ -20,7 +20,7 @@ const Gallery = styled.section`
   /* Medium screens */
 @media all and (max-width: 800px) {
   .navigation {
-    /* When on medium sized screens, we center it by evenly distributing empty space around items */
+    /* When on medium ssized screens, we center it by evenly distributing empty space around items */
     justify-content: space-around;
   }
 }
@@ -47,7 +47,7 @@ const Work = () => {
         <GalleryCard
           title="Meeting Hill"
           imageUrl="meetingHill.jpg"
-          link="/MeetingHill/"
+          link="/meetingHill/"
           linkText="Line loot pinnace ahoy scurvy Jolly Roger squiffy clap of thunder
             code of conduct Shiver me timbers. "
           >

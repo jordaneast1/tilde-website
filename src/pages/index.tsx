@@ -110,10 +110,10 @@ return (
     
     <MainCanvas />
     
-    <Blank><ArrowDown to="/#about-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
-    <About />
-    <Blank2 />
+    <Blank><ArrowDown to="/#work-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
     <Work />
+    <Blank2 />
+    <About />
     <Footer />
     <Contact />
     <Nav />

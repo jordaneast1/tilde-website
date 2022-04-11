@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {FBXLoader} from 'three/examples/jsm/loaders/FBXLoader'
 
 
-// import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
+import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -16,7 +16,8 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { LuminosityShaderWithOpacity } from './Shaders/LuminosityShaderWithOpacity';
 import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
 import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
-import { Object3D } from 'three/build/three.module'
+// import { PMREMGenerator } from 'three/examples/jsm/environments'
+import { Color, Object3D } from 'three/build/three.module'
 
 
 const StyledDiv = styled.div`
@@ -29,6 +30,8 @@ const StyledDiv = styled.div`
 
 const MainCanvas = () => {
   const threeElement = useRef()
+  let texLoader = useRef();
+  let loader = useRef()
   let renderer = useRef()
   let camera = useRef()
   let controls = useRef()
@@ -45,12 +48,17 @@ const MainCanvas = () => {
   let effectSobel = useRef()
   let effectGrayScale = useRef()
   let effectPixel = useRef();
+  let skyBoxTex = useRef();
+  let pmremGenerator = useRef();
+  let landscape = useRef();
+  let bake = useRef();;
 
   const params = {
     enable: true,
     sobelOpacity: 0.0,
     greyscaleOpacity: 0.0,
-    pixelSize: 2.0
+    pixelSize: 2.0,
+    enableOrbitControls: true
   };
 
   const transitions = {
@@ -75,13 +83,19 @@ const MainCanvas = () => {
     mouse = new THREE.Vector2();
     target = new THREE.Vector2();
 
+    loader = new FBXLoader();
+    texLoader = new THREE.TextureLoader();
+
+
     initScene()
-    initGeo()
-    initControls()
     initLights()
+
+    initGeo()
+    initLandscape()
+    //initControls()
     loadPlane()
-    initTerrain()
-    initSky()
+    //initTerrain()
+    //initSky()
 
     let then = 0;
     const animate = (now) => {
@@ -113,7 +127,10 @@ const MainCanvas = () => {
       effectGrayScale.uniforms[ 'opacity' ].value = greyscalePos;
       effectPixel.uniforms[ "pixelSize" ].value = pixelSize;
 
-      if ( params.enable === true ) {
+      //console.log(sobelTime)
+
+      //turn off if at top
+      if (( params.enable === true ) && (sobelTime > 0)){
 
         composer.render();
 
@@ -123,10 +140,9 @@ const MainCanvas = () => {
 
       }
 
-      // shape.rotation.x += 0.01
       shape.rotation.y += 0.02
 
-      updateSun()
+      //updateSun()
 
       //  let target = new THREE.Vector2();
       // target.x = ( 1 - mouse.x ) * 0.002;
@@ -134,7 +150,12 @@ const MainCanvas = () => {
       
       // camera.rotation.x += .005  * ( target.y - camera.rotation.x );
       // camera.rotation.y += .005  * ( target.x - camera.rotation.y );
-      controls.update();
+      var vec = new THREE.Vector3();
+      camera.getWorldDirection(vec)
+      console.log(camera.position,vec )
+
+      //controls.enable = params.enableOrbitControls
+      //controls.update();
 
       requestAnimationFrame(animate)
     }
@@ -166,20 +187,45 @@ const MainCanvas = () => {
     camera.updateProjectionMatrix()
   }
 
+  THREE.DefaultLoadingManager.onLoad = function ( ) {
+  
+    console.log( 'Loading Complete!');
+
+    scene.background = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+    scene.environment =  pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+    
+    landscape.traverse( function ( child ) {
+
+      if ( child.isMesh ) {
+        child.material.envMap = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+        child.material.needsUpdate = true
+        console.log(child.name, child.material.color)
+
+      }
+    });
+  
+  };
+
   const initScene = () => {
     let w = threeElement.current.clientWidth
     let h = threeElement.current.clientHeight
     scene = new THREE.Scene()
+
     fogCol = new THREE.Color(0xffffff);
-    scene.fog = new THREE.FogExp2(fogCol, 0.0005)
+    scene.fog = new THREE.FogExp2(fogCol, 0.0001)
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(w, h)
-    renderer.setClearColor('#000')
+    //renderer.setClearColor('#000')
+
+    pmremGenerator = new THREE.PMREMGenerator( renderer );
+    pmremGenerator.compileEquirectangularShader();
+
+    skyBoxTex = texLoader.load( '/textures/Skybox.png');
 
     //camera
-    camera = new THREE.PerspectiveCamera(50, w / h, 1, 10000)
-
+    camera = new THREE.PerspectiveCamera(50, w / h, .01, 10000)
+   
     threeElement.current.appendChild(renderer.domElement)
     window.addEventListener('resize', () => {
       resize()
@@ -217,27 +263,37 @@ const MainCanvas = () => {
     composer.addPass( effectPixel );
 
 
-    // const gui = new GUI();
+    const gui = new GUI();
 
-    //     gui.add( params, 'enable' );
-    //     var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
-    //     var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
+        gui.add( params, 'enable' );
+        var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
+        var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
+        var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 
-    //     // gui.open();
+        const camFolder = gui.addFolder('Camera')
+        const camPos = camFolder.addFolder('Position')
+        const camRot = camFolder.addFolder('Rotation')
+        camFolder.add( params, 'enableOrbitControls' );
+        camRot.add(camera.rotation, 'x', 0, Math.PI * 2)
+        camRot.add(camera.rotation, 'y', 0, Math.PI * 2)
+        camRot.add(camera.rotation, 'z', 0, Math.PI * 2)
+        camPos.add(camera.position, 'x', -1000, 1000)
+        camPos.add(camera.position, 'y', -1000, 1000)
+        camPos.add(camera.position, 'z', -1000, 1000)
+
+        gui.open();
         
-    //     sobelOpacitySlider.onChange(function(value){
-    //       effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
-    //     });
+        sobelOpacitySlider.onChange(function(value){
+          effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
+        });
 
-    //     greyscaleOpacitySlider.onChange(function(value){
-    //       effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
-    //     });
+        greyscaleOpacitySlider.onChange(function(value){
+          effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
+        });
 
-    //     var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
-
-    //     pixelSlider.onChange(function(value){
-    //       effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
-    //     });
+        pixelSlider.onChange(function(value){
+          effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
+        });
 
   }
 
@@ -254,34 +310,31 @@ const MainCanvas = () => {
     controls.maxDistance = 200
 
     controls.maxPolarAngle = Math.PI / 2
-
-    camera.position.y = 5000
-    camera.position.z = 1000
-    controls.target = shape.position
+    controls.panSpeed = 10
+    //controls.target = shape.position
+    camera.position.set(282.7908329, 1.21828,  -40.18255)
+    camera.rotation.set(0.11984934600336096, -6.12323399573676, -0.992792090149074)
     controls.update()
+    
   }
 
   const initLights = () => {
     //lights
-    const lightA = new THREE.PointLight(0xffffff, 1)
-    lightA.position.set(500, 500, 500)
-    scene.add(lightA)
+    const lightA = new THREE.DirectionalLight( new THREE.Color('white'), 3);
+    lightA.castShadow = true;
+    lightA.position.set(5, 10, 7.5)
+    //scene.add(lightA)
 
-    const lightB = new THREE.PointLight(0xffffff, 1)
-    lightB.position.set(-500, -500, -500)
-    scene.add(lightB)
   }
 
   const initGeo = () => {
     //geo
     shape = new Object3D();
 
-    const loader = new FBXLoader();
-    const texLoader = new THREE.TextureLoader();
 		loader.load( '/models/TildeLogo2.fbx', function ( object ) {
       
       const tildealbedo = texLoader.load( '/textures/tefmajbn_4K_Albedo.jpg');
-      const tilderoughness = new THREE.TextureLoader().load( '/textures/tefmajbn_4K_Roughness.jpg' );
+      const tilderoughness = texLoader.load( '/textures/tefmajbn_4K_Roughness.jpg' );
       // console.log(texture)
       shape.add(object);
       // const material = new THREE.MeshPhysicalMaterial({roughness:0.8, map:tildealbedo, metalness: 0.5, reflectivity: 0.6})
@@ -295,8 +348,8 @@ const MainCanvas = () => {
         }
       });
     });
-    
-    shape.position.set(0,200,0)
+    shape.scale.set(7,7,7)
+    shape.position.set(0,350,-3500)
 
     scene.add(shape)
 
@@ -304,32 +357,35 @@ const MainCanvas = () => {
 
   const initLandscape = () => {
     //geo
-    shape = new Object3D();
+    landscape = new Object3D();
 
-    const loader = new FBXLoader();
-    const texLoader = new THREE.TextureLoader();
-		loader.load( '/models/TildeLogo2.fbx', function ( object ) {
-      
-      const tildealbedo = texLoader.load( '/textures/tefmajbn_4K_Albedo.jpg');
-      const tilderoughness = new THREE.TextureLoader().load( '/textures/tefmajbn_4K_Roughness.jpg' );
-      // console.log(texture)
-      shape.add(object);
-      // const material = new THREE.MeshPhysicalMaterial({roughness:0.8, map:tildealbedo, metalness: 0.5, reflectivity: 0.6})
-      // object.material = material;
-      object.traverse( function ( child ) {
+    texLoader.load( '/textures/MtTildeSliced_Albedo.jpg', function (landscapeAlbedo) {
 
-        if ( child.isMesh ) {
-          const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color(0x4), roughness:0.9, roughnessMap: tilderoughness, map:tildealbedo, metalness: 0.3, reflectivity: 0.1})
-          child.material = material // assign your diffuse texture here
-      
-        }
+      loader.load( '/models/MtTildeSliced.fbx', function ( object ) {
+                
+        console.log(landscapeAlbedo)
+        landscapeAlbedo.wrapS = THREE.RepeatWrapping;
+        landscapeAlbedo.wrapT = THREE.RepeatWrapping;
+        landscape.add(object);
+        object.traverse( function ( child ) {
+
+          if ( child.isMesh ) {
+            const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color('white'), roughness:1, map:landscapeAlbedo, metalness:0, reflectivity: 0})
+            material.receiveShadow = true
+            child.material = material // assign your diffuse texture here
+            child.material.needsUpdate = true
+          }
+        });
+
       });
-    });
+
+      landscape.scale.set(10,10,10)
+      landscape.rotation.set(0,0,0)
+      landscape.position.set(0,100,0)
     
-    shape.position.set(0,200,0)
 
-    scene.add(shape)
-
+      scene.add(landscape)
+    });
 
   }
 
@@ -388,7 +444,7 @@ const MainCanvas = () => {
 
     
     fogCol = new THREE.Color(scrollPos,scrollPos,scrollPos);
-    scene.fog.color.set(fogCol)
+    //scene.fog.color.set(fogCol)
 
     var theta = Math.PI * (sunParameters.inclination - 0.5)
     var phi = 2 * Math.PI * (sunParameters.azimuth - 0.5)
@@ -406,126 +462,6 @@ const MainCanvas = () => {
     cubeCamera.update(renderer, sky)
   }
 
-  function generateHeight(width, height) {
-    var size = width * height,
-      data = new Uint8Array(size),
-      perlin = new ImprovedNoise(),
-      quality = 1,
-      z = Math.random() * 100
-
-    for (var j = 0; j < 4; j++) {
-      for (var i = 0; i < size; i++) {
-        var x = i % width,
-          y = ~~(i / width)
-        data[i] += Math.abs(
-          perlin.noise(x / quality, y / quality, z) * quality * 1.75
-        )
-      }
-
-      quality *= 5
-    }
-
-    return data
-  }
-
-  function generateTexture(data, width, height) {
-    var canvas, canvasScaled, context, image, imageData, vector3, sun, shade
-
-    vector3 = new THREE.Vector3(0, 0, 0)
-
-    sun = new THREE.Vector3(1, 1, 1)
-    sun.normalize()
-
-    canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
-
-    context = canvas.getContext('2d')
-    context.fillStyle = '#000'
-    context.fillRect(0, 0, width, height)
-
-    image = context.getImageData(0, 0, canvas.width, canvas.height)
-    imageData = image.data
-
-    for (var i = 0, j = 0, l = imageData.length; i < l; i += 4, j++) {
-      vector3.x = data[j - 2] - data[j + 2]
-      vector3.y = 2
-      vector3.z = data[j - width * 2] - data[j + width * 2]
-      vector3.normalize()
-
-      shade = vector3.dot(sun)
-
-      imageData[i] = (96 + shade * 128) * (0.5 + data[j] * 0.007)
-      imageData[i + 1] = (32 + shade * 96) * (0.5 + data[j] * 0.007)
-      imageData[i + 2] = shade * 96 * (0.5 + data[j] * 0.007)
-    }
-
-    context.putImageData(image, 0, 0)
-
-    // Scaled 4x
-
-    canvasScaled = document.createElement('canvas')
-    canvasScaled.width = width * 4
-    canvasScaled.height = height * 4
-
-    context = canvasScaled.getContext('2d')
-    context.scale(4, 4)
-    context.drawImage(canvas, 0, 0)
-
-    image = context.getImageData(0, 0, canvasScaled.width, canvasScaled.height)
-    imageData = image.data
-
-    var seed = 0.1;
-    for (var i = 0, l = imageData.length; i < l; i += 4) {
-      var v = ~~(seed)
-
-      imageData[i] += v
-      imageData[i + 1] += v
-      imageData[i + 2] += v
-    }
-
-    context.putImageData(image, 0, 0)
-
-    return canvasScaled
-  }
-
-  const initTerrain = () => {
-    var worldWidth = 256,
-      worldDepth = 256
-    var worldHalfWidth = worldWidth / 2
-    var worldHalfDepth = worldDepth / 2
-    var data = generateHeight(worldWidth, worldDepth)
-
-    camera.position.y =
-      data[worldHalfWidth + worldHalfDepth * worldWidth] * 1 
-
-    var geometry = new THREE.PlaneBufferGeometry(
-      7500,
-      7500,
-      worldWidth - 1,
-      worldDepth - 1
-    )
-    geometry.rotateX(-Math.PI / 2)
-
-    var vertices = geometry.attributes.position.array
-
-    for (var i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
-      vertices[j + 1] = data[i] * 3
-    }
-
-    var texture = new THREE.CanvasTexture(
-      generateTexture(data, worldWidth, worldDepth)
-    )
-    texture.wrapS = THREE.ClampToEdgeWrapping
-    texture.wrapT = THREE.ClampToEdgeWrapping
-
-    var mesh = new THREE.Mesh(
-      geometry,
-      new THREE.MeshBasicMaterial({ map: texture })
-    )
-    scene.add(mesh)
-    mesh.position.setY(-50)
-  }
 
   const onMouseMove = (event) => {
     let w = threeElement.current.clientWidth
@@ -536,6 +472,25 @@ const MainCanvas = () => {
     //console.log(mouse.x, mouse.y)
   
   }
+
+  THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+
+    console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+  
+  };
+    
+  
+  THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+  
+    console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+  
+  };
+  
+  THREE.DefaultLoadingManager.onError = function ( url ) {
+  
+    console.log( 'There was an error loading ' + url );
+  
+  };
 
   return <StyledDiv className="App" ref={threeElement} />
 }

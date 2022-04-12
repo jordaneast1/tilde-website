@@ -18,6 +18,9 @@ import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
 import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
 // import { PMREMGenerator } from 'three/examples/jsm/environments'
 import { Color, Object3D } from 'three/build/three.module'
+import {Text} from 'troika-three-text'
+import {EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
+import { TWEEN } from 'three/examples/jsm/libs/tween.module.min'
 
 
 const StyledDiv = styled.div`
@@ -29,6 +32,7 @@ const StyledDiv = styled.div`
 `
 
 const MainCanvas = () => {
+
   const threeElement = useRef()
   let texLoader = useRef();
   let loader = useRef()
@@ -51,7 +55,8 @@ const MainCanvas = () => {
   let skyBoxTex = useRef();
   let pmremGenerator = useRef();
   let landscape = useRef();
-  let bake = useRef();;
+  let text1 = useRef();
+  let exrLoader = useRef();
 
   const params = {
     enable: true,
@@ -70,12 +75,28 @@ const MainCanvas = () => {
     pixelPosOut: 1 
   }
 
+  let controlsOn = false;
+
   let targetScrollPos = 0;
   let scrollPos = 0;
 
   const sobelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1.5),new THREE.Vector2(0,2),new THREE.Vector2(0,0));
   const greyscaleCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1),new THREE.Vector2(0,1),new THREE.Vector2(0,0));
   const pixelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1),new THREE.Vector2(0,1),new THREE.Vector2(0,1));
+
+  let selectedObject = null;
+  let group;
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+
+  let pos1 = new THREE.Object3D();
+  let pos2 = new THREE.Object3D();
+  let pos3 = new THREE.Object3D();
+  pos1.position.set(100,550,-4000);
+  pos2.position.set(-300,150,-1000);
+  pos3.position.set(3500,150,-6000);
+
+  let raycasted = []
 
 
   useEffect(() => {
@@ -85,14 +106,16 @@ const MainCanvas = () => {
 
     loader = new FBXLoader();
     texLoader = new THREE.TextureLoader();
+    exrLoader = new EXRLoader();
 
 
     initScene()
     initLights()
-
+    initInteraction()
     initGeo()
     initLandscape()
-    //initControls()
+    initText()
+    if (controlsOn){  initControls()  }
     loadPlane()
     //initTerrain()
     //initSky()
@@ -140,7 +163,7 @@ const MainCanvas = () => {
 
       }
 
-      shape.rotation.y += 0.02
+      shape.rotation.y += 0.002
 
       //updateSun()
 
@@ -152,57 +175,40 @@ const MainCanvas = () => {
       // camera.rotation.y += .005  * ( target.x - camera.rotation.y );
       var vec = new THREE.Vector3();
       camera.getWorldDirection(vec)
-      console.log(camera.position,vec )
 
-      //controls.enable = params.enableOrbitControls
-      //controls.update();
+      if (controlsOn){
+        controls.enable = params.enableOrbitControls
+        controls.update();
+      }
+      text1.setRotationFromMatrix(camera.matrix)
+      text1.sync()
 
+      TWEEN.update()
       requestAnimationFrame(animate)
     }
     animate()
   }, [])
 
-  const handleScroll = () => { 
-    targetScrollPos = getVerticalScrollNormalised(document.body)
-    //console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
-  }
-  
-  const getVerticalScrollNormalised = ( elm ) => {
-    var p = elm.parentNode
-    return (elm.scrollTop || p.scrollTop) / (p.scrollHeight - p.clientHeight )
-  }
-
-  const resize = () => {
-    let w = threeElement.current.clientWidth
-    let h = threeElement.current.clientHeight
-    renderer.setSize(w, h)
-    composer.setSize( w, h);
-
-    effectSobel.uniforms[ 'resolution' ].value.x = w * window.devicePixelRatio * 64;
-    effectSobel.uniforms[ 'resolution' ].value.y = h * window.devicePixelRatio * 64;
-
-    effectPixel.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
-
-    camera.aspect = w / h
-    camera.updateProjectionMatrix()
-  }
-
   THREE.DefaultLoadingManager.onLoad = function ( ) {
   
     console.log( 'Loading Complete!');
-
-    scene.background = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
-    scene.environment =  pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+    skyBoxTex.rotation = Math.PI;
+    const env = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+    
+    scene.background = env;
+    scene.environment =  env;
     
     landscape.traverse( function ( child ) {
 
       if ( child.isMesh ) {
-        child.material.envMap = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+        child.material.envMap = env;
         child.material.needsUpdate = true
         console.log(child.name, child.material.color)
 
       }
     });
+
+    pmremGenerator.dispose();
   
   };
 
@@ -212,7 +218,7 @@ const MainCanvas = () => {
     scene = new THREE.Scene()
 
     fogCol = new THREE.Color(0xffffff);
-    scene.fog = new THREE.FogExp2(fogCol, 0.0001)
+    scene.fog = new THREE.FogExp2(fogCol, 0.00015)
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(w, h)
@@ -221,10 +227,10 @@ const MainCanvas = () => {
     pmremGenerator = new THREE.PMREMGenerator( renderer );
     pmremGenerator.compileEquirectangularShader();
 
-    skyBoxTex = texLoader.load( '/textures/Skybox.png');
+    skyBoxTex = exrLoader.load( '/textures/Skybox2k_zip.exr');
 
     //camera
-    camera = new THREE.PerspectiveCamera(50, w / h, .01, 10000)
+    camera = new THREE.PerspectiveCamera(50, w / h, .01, 20000)
    
     threeElement.current.appendChild(renderer.domElement)
     window.addEventListener('resize', () => {
@@ -262,40 +268,130 @@ const MainCanvas = () => {
     effectPixel.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
     composer.addPass( effectPixel );
 
+    initGUI()
+  }
 
+  const initGUI = () => {
     const gui = new GUI();
 
-        gui.add( params, 'enable' );
-        var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
-        var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
-        var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
+    gui.add( params, 'enable' );
+    var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
+    var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
+    var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
 
-        const camFolder = gui.addFolder('Camera')
-        const camPos = camFolder.addFolder('Position')
-        const camRot = camFolder.addFolder('Rotation')
-        camFolder.add( params, 'enableOrbitControls' );
-        camRot.add(camera.rotation, 'x', 0, Math.PI * 2)
-        camRot.add(camera.rotation, 'y', 0, Math.PI * 2)
-        camRot.add(camera.rotation, 'z', 0, Math.PI * 2)
-        camPos.add(camera.position, 'x', -1000, 1000)
-        camPos.add(camera.position, 'y', -1000, 1000)
-        camPos.add(camera.position, 'z', -1000, 1000)
+    const camFolder = gui.addFolder('Camera')
+    const camPos = camFolder.addFolder('Position')
+    const camRot = camFolder.addFolder('Rotation')
+    camFolder.add( params, 'enableOrbitControls' );
+    camRot.add(camera.rotation, 'x', 0, Math.PI * 2).step(0.1)
+    camRot.add(camera.rotation, 'y', 0, Math.PI * 2).step(0.1)
+    camRot.add(camera.rotation, 'z', 0, Math.PI * 2).step(0.1)
+    camPos.add(camera.position, 'x', -3000, 3000).step(0.1)
+    camPos.add(camera.position, 'y', -3000, 3000).step(0.1)
+    camPos.add(camera.position, 'z', -3000, 3000).step(0.1)
+    
+    // const objFolder = gui.addFolder('Objects')
+    // objFolder.add(pos1.position, 'x', -3000, 3000).step(0.1)
+    // objFolder.add(pos1.position, 'y', -3000, 3000).step(0.1)
+    // objFolder.add(pos1.position, 'z', -3000, 3000).step(0.1)
 
-        gui.open();
-        
-        sobelOpacitySlider.onChange(function(value){
-          effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
-        });
+    gui.open();
+    
+    sobelOpacitySlider.onChange(function(value){
+      effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
+    });
 
-        greyscaleOpacitySlider.onChange(function(value){
-          effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
-        });
+    greyscaleOpacitySlider.onChange(function(value){
+      effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
+    });
 
-        pixelSlider.onChange(function(value){
-          effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
-        });
+    pixelSlider.onChange(function(value){
+      effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
+    });
+  }
+
+
+  const initInteraction = () => {
+    group = new THREE.Group();
+    scene.add( group );
+    const spriteTex = texLoader.load( '/textures/Circle1.png' );
+		const sprite1 = new THREE.Sprite( new THREE.SpriteMaterial( { map: spriteTex, color: '#fff' , sizeAttenuation: false} ) );
+    sprite1.position.set(0,10,10);
+    sprite1.scale.set( .07, .07 ,.07 );
+    pos1.add( sprite1 );
+    group.add( pos1 )
+
+    const sprite2 = new THREE.Sprite( new THREE.SpriteMaterial( { map: spriteTex, color: '#fff', sizeAttenuation: false } ) );
+    sprite2.material.rotation = Math.PI / 3 * 4;
+    sprite2.position.set( 8, - 2, 2 );
+    sprite2.center.set( 0.5, 0 );
+    sprite2.scale.set(.1, .1, .1 );
+    pos2.add( sprite2 );
+    group.add( pos2 )
+
+    const sprite3 = new THREE.Sprite( new THREE.SpriteMaterial( {map: spriteTex, color: '#fff' , sizeAttenuation: false} ) );
+    sprite3.position.set( 0, 2, 5 );
+    sprite3.scale.set( .1, .1, .1 );
+    sprite3.center.set( - 0.1, 0 );
+    sprite3.material.rotation = Math.PI / 3;
+    pos3.add( sprite3 );
+    group.add( pos3 )
+
+    raycasted = [sprite1,sprite2,sprite3]
+    document.addEventListener( 'pointermove', onPointerMove );
 
   }
+
+  //pointer interaction
+  function onPointerMove( event ) {
+
+    if ( selectedObject ) {
+      selectedObject.material.color.set( '#fff' );
+      selectedObject = null;
+    }
+
+    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    raycaster.setFromCamera( pointer, camera );
+    const intersects = raycaster.intersectObjects( raycasted, true );
+
+    if ( intersects.length > 0 ) {
+      const res = intersects.filter( function ( res ) {
+        return res && res.object;
+      } )[ 0 ];
+      if ( res && res.object ) {
+        selectedObject = res.object;
+        selectedObject.material.color.set( '#69f' );
+        
+        let tweener = {x:.1}
+        new TWEEN.Tween(tweener).to({x:.2}, 1000).easing(TWEEN.Easing.Quadratic.Out).onUpdate(() => {
+          //selectedObject.scale.set(tweener.x,tweener.x,tweener.x)
+        })
+        .start() // Start the tween immediately.
+
+
+      }
+    }
+  }
+
+  const initText = () => {
+    const robotolight = "/Roboto-Light.ttf"//https://fonts.googleapis.com/css2?family=Roboto:wght@300"
+    text1 = new Text()
+    pos1.add(text1)
+    text1.position.set(0,450,0)
+    // Set properties to configure:
+    text1.text = 'WORK'
+    text1.anchorX = 'center'
+    text1.fontSize = 200
+    text1.color = 0xFFFFFF
+    text1.letterSpacing = .2
+    text1.font = robotolight
+    text1.setRotationFromMatrix(camera.matrix)
+    text1.sync()
+  }
+
+  //init functions
 
   const initControls = () => {
     controls = new OrbitControls(camera, renderer.domElement)
@@ -309,7 +405,7 @@ const MainCanvas = () => {
     controls.minDistance = 100
     controls.maxDistance = 200
 
-    controls.maxPolarAngle = Math.PI / 2
+    controls.maxPolarAngle = Math.PI // 2
     controls.panSpeed = 10
     //controls.target = shape.position
     camera.position.set(282.7908329, 1.21828,  -40.18255)
@@ -320,10 +416,10 @@ const MainCanvas = () => {
 
   const initLights = () => {
     //lights
-    const lightA = new THREE.DirectionalLight( new THREE.Color('white'), 3);
+    const lightA = new THREE.DirectionalLight( new THREE.Color("rgb(255,216,148)"), .7);
     lightA.castShadow = true;
-    lightA.position.set(5, 10, 7.5)
-    //scene.add(lightA)
+    lightA.position.set(85.473, 223, 256)
+    scene.add(lightA)
 
   }
 
@@ -360,6 +456,8 @@ const MainCanvas = () => {
     landscape = new Object3D();
 
     texLoader.load( '/textures/MtTildeSliced_Albedo.jpg', function (landscapeAlbedo) {
+      const ao = texLoader.load( '/textures/MtTilde_AO.jpg')
+      const normal = texLoader.load( '/textures/MtTilde_Normal.jpg')
 
       loader.load( '/models/MtTildeSliced.fbx', function ( object ) {
                 
@@ -370,7 +468,16 @@ const MainCanvas = () => {
         object.traverse( function ( child ) {
 
           if ( child.isMesh ) {
-            const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color('white'), roughness:1, map:landscapeAlbedo, metalness:0, reflectivity: 0})
+            const material = new THREE.MeshPhysicalMaterial(
+              { color: new THREE.Color('white'), 
+                aoMap: ao, aoMapIntensity: 1,
+                normalMap: normal, normalScale: new THREE.Vector2(.3,.3), 
+                envMapIntensity:1, 
+                roughness:1, 
+                map:landscapeAlbedo, 
+                metalness:0, 
+                reflectivity: 0}
+            )
             material.receiveShadow = true
             child.material = material // assign your diffuse texture here
             child.material.needsUpdate = true
@@ -381,13 +488,15 @@ const MainCanvas = () => {
 
       landscape.scale.set(10,10,10)
       landscape.rotation.set(0,0,0)
-      landscape.position.set(0,100,0)
+      landscape.position.set(0,0,0)
     
 
       scene.add(landscape)
     });
 
   }
+
+  
 
   const loadPlane = () => {
     const planeMaterial = new THREE.MeshPhysicalMaterial({
@@ -462,7 +571,7 @@ const MainCanvas = () => {
     cubeCamera.update(renderer, sky)
   }
 
-
+// UTILITY FNCT
   const onMouseMove = (event) => {
     let w = threeElement.current.clientWidth
     let h = threeElement.current.clientHeight
@@ -472,6 +581,35 @@ const MainCanvas = () => {
     //console.log(mouse.x, mouse.y)
   
   }
+  
+  const handleScroll = () => { 
+    targetScrollPos = getVerticalScrollNormalised(document.body)
+    //console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
+  }
+  
+  const getVerticalScrollNormalised = ( elm ) => {
+    var p = elm.parentNode
+    return (elm.scrollTop || p.scrollTop) / (p.scrollHeight - p.clientHeight )
+  }
+
+ 
+
+
+  const resize = () => {
+    let w = threeElement.current.clientWidth
+    let h = threeElement.current.clientHeight
+    renderer.setSize(w, h)
+    composer.setSize( w, h);
+
+    effectSobel.uniforms[ 'resolution' ].value.x = w * window.devicePixelRatio * 64;
+    effectSobel.uniforms[ 'resolution' ].value.y = h * window.devicePixelRatio * 64;
+
+    effectPixel.uniforms[ "resolution" ].value.set( window.innerWidth, window.innerHeight ).multiplyScalar( window.devicePixelRatio );
+
+    camera.aspect = w / h
+    camera.updateProjectionMatrix()
+  }
+
 
   THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
 

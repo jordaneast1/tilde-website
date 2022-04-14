@@ -6,6 +6,8 @@ import styled from 'styled-components'
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {FBXLoader} from 'three/examples/jsm/loaders/FBXLoader'
+import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader'
+import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader'
 
 
 import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
@@ -36,6 +38,8 @@ const MainCanvas = () => {
   const threeElement = useRef()
   let texLoader = useRef();
   let loader = useRef()
+  let objloader = useRef()
+
   let renderer = useRef()
   let camera = useRef()
   let controls = useRef()
@@ -53,6 +57,7 @@ const MainCanvas = () => {
   let effectGrayScale = useRef()
   let effectPixel = useRef();
   let skyBoxTex = useRef();
+  let skyBoxBGTex = useRef();
   let pmremGenerator = useRef();
   let landscape = useRef();
   let text1 = useRef();
@@ -60,6 +65,7 @@ const MainCanvas = () => {
   let text3 = useRef();
 
   let exrLoader = useRef();
+  let rgbeLoader = useRef();
 
   const params = {
     enable: false,
@@ -79,7 +85,7 @@ const MainCanvas = () => {
     pixelPosOut: 1 
   }
 
-  let controlsOn = false;
+  let controlsOn = true;
 
   let targetScrollPos = 0;
   let scrollPos = 0;
@@ -135,8 +141,10 @@ const MainCanvas = () => {
     target = new THREE.Vector2();
 
     loader = new FBXLoader();
+    objloader = new OBJLoader();
     texLoader = new THREE.TextureLoader();
     exrLoader = new EXRLoader();
+    rgbeLoader = new RGBELoader();
 
 
     initScene()
@@ -244,8 +252,11 @@ const MainCanvas = () => {
     console.log( 'Loading Complete!');
     skyBoxTex.rotation = Math.PI;
     const env = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+    skyBoxBGTex.rotation = Math.PI;
+    //const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
+    const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
     
-    scene.background = env;
+    scene.background = BGenv;
     scene.environment =  env;
     
     landscape.traverse( function ( child ) {
@@ -268,7 +279,7 @@ const MainCanvas = () => {
     scene = new THREE.Scene()
 
     fogCol = new THREE.Color(0xffffff);
-    scene.fog = new THREE.FogExp2(fogCol, 0.00015)
+    scene.fog = new THREE.FogExp2(fogCol, 0.00005)
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(w, h)
@@ -277,10 +288,11 @@ const MainCanvas = () => {
     pmremGenerator = new THREE.PMREMGenerator( renderer );
     pmremGenerator.compileEquirectangularShader();
 
-    skyBoxTex = exrLoader.load( '/textures/Skybox2k_zip.exr');
-
+    skyBoxTex = exrLoader.load( '/textures/Skybox2k_zip.exr'); 
+    skyBoxBGTex = texLoader.load( '/textures/SkyboxBackground.jpg');
+    //skyBoxBGTex = rgbeLoader.load( '/textures/SkyboxNewRGBE.hdr');
     //camera
-    camera = new THREE.PerspectiveCamera(50, w / h, .01, 20000)
+    camera = new THREE.PerspectiveCamera(50, w / h, .1, 50000)
    
     threeElement.current.appendChild(renderer.domElement)
     window.addEventListener('resize', () => {
@@ -708,11 +720,133 @@ const MainCanvas = () => {
     
 
       scene.add(landscape)
+
+      objloader.load( '/models/BG_MountainALT.obj', function ( object ) {
+                
+        console.log(landscapeAlbedo)
+        landscapeAlbedo.wrapS = THREE.RepeatWrapping;
+        landscapeAlbedo.wrapT = THREE.RepeatWrapping;
+        scene.add(object);
+        object.traverse( function ( child ) {
+
+          if ( child.isMesh ) {
+            const material = new THREE.MeshPhysicalMaterial(
+              { color: new THREE.Color('white'), 
+                aoMap: ao, aoMapIntensity: 1,
+                normalMap: normal, normalScale: new THREE.Vector2(.3,.3), 
+                envMapIntensity:1, 
+                roughness:1, 
+                map:landscapeAlbedo, 
+                metalness:0, 
+                reflectivity: 0}
+            )
+            material.receiveShadow = true
+            child.material = material // assign your diffuse texture here
+            child.material.needsUpdate = true
+          }
+        });
+        object.scale.set(1,1,1)
+
+      });
+    });
+    initBGLandscape()
+  }
+
+  const initBGLandscape = () => {
+    //geo
+    //landscape = new Object3D();
+
+    texLoader.load( '/textures/BackgroundMountains_Albedo.jpg', function (landscapeAlbedo) {
+      const ao = texLoader.load( '/textures/MtTilde_AO.jpg')
+      const normal = texLoader.load( '/textures/MtTilde_Normal.jpg')
+
+      objloader.load( '/models/BG_Mountain1.obj', function ( object ) {
+                
+        console.log(landscapeAlbedo)
+        landscapeAlbedo.wrapS = THREE.RepeatWrapping;
+        landscapeAlbedo.wrapT = THREE.RepeatWrapping;
+        scene.add(object);
+        object.traverse( function ( child ) {
+
+          if ( child.isMesh ) {
+            const material = new THREE.MeshPhysicalMaterial(
+              { color: new THREE.Color('white'), 
+                aoMap: ao, aoMapIntensity: 1,
+                normalMap: normal, normalScale: new THREE.Vector2(.3,.3), 
+                envMapIntensity:1, 
+                roughness:1, 
+                map:landscapeAlbedo, 
+                metalness:0, 
+                reflectivity: 0}
+            )
+            material.receiveShadow = true
+            child.material = material // assign your diffuse texture here
+            child.material.needsUpdate = true
+          }
+        });
+        object.scale.set(1,1,1)
+      });
+
+      objloader.load( '/models/BG_Mountain2.obj', function ( object ) {
+                
+        console.log(landscapeAlbedo)
+        landscapeAlbedo.wrapS = THREE.RepeatWrapping;
+        landscapeAlbedo.wrapT = THREE.RepeatWrapping;
+        scene.add(object);
+        object.traverse( function ( child ) {
+
+          if ( child.isMesh ) {
+            const material = new THREE.MeshPhysicalMaterial(
+              { color: new THREE.Color('white'), 
+                aoMap: ao, aoMapIntensity: 1,
+                normalMap: normal, normalScale: new THREE.Vector2(.3,.3), 
+                envMapIntensity:1, 
+                roughness:1, 
+                map:landscapeAlbedo, 
+                metalness:0, 
+                reflectivity: 0}
+            )
+            material.receiveShadow = true
+            child.material = material // assign your diffuse texture here
+            child.material.needsUpdate = true
+          }
+        });
+        object.scale.set(1,1,1)
+
+      });
+      objloader.load( '/models/BG_Mountain3.obj', function ( object ) {
+                
+        console.log(landscapeAlbedo)
+        landscapeAlbedo.wrapS = THREE.RepeatWrapping;
+        landscapeAlbedo.wrapT = THREE.RepeatWrapping;
+        scene.add(object);
+        object.traverse( function ( child ) {
+
+          if ( child.isMesh ) {
+            const material = new THREE.MeshPhysicalMaterial(
+              { color: new THREE.Color('white'), 
+                aoMap: ao, aoMapIntensity: 1,
+                normalMap: normal, normalScale: new THREE.Vector2(.3,.3), 
+                envMapIntensity:1, 
+                roughness:1, 
+                map:landscapeAlbedo, 
+                metalness:0, 
+                reflectivity: 0}
+            )
+            material.receiveShadow = true
+            child.material = material // assign your diffuse texture here
+            child.material.needsUpdate = true
+          }
+        });
+        object.scale.set(1,1,1)
+
+      });
+
+
+
     });
 
   }
-
-  
 
   const loadPlane = () => {
     const planeMaterial = new THREE.MeshPhysicalMaterial({
@@ -733,7 +867,7 @@ const MainCanvas = () => {
   }
 
   const initSky = () => {
-    sunLight = new THREE.DirectionalLight(0xffffff, 1)
+    sunLight = new THREE.DirectionalLight(0xffd894, 1)
     scene.add(sunLight)
 
     sky = new Sky()

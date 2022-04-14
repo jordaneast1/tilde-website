@@ -92,9 +92,9 @@ const MainCanvas = () => {
   let pos1 = new THREE.Object3D();
   let pos2 = new THREE.Object3D();
   let pos3 = new THREE.Object3D();
-  pos1.position.set(100,550,-4000);
-  pos2.position.set(-300,150,-1000);
-  pos3.position.set(3500,150,-6000);
+  pos1.position.set(-3500,600,-5200);
+  pos2.position.set(-250,1500,-5200);
+  pos3.position.set (3250,600,-5200);
 
   let raycasted = []
 
@@ -286,9 +286,9 @@ const MainCanvas = () => {
     camRot.add(camera.rotation, 'x', 0, Math.PI * 2).step(0.1)
     camRot.add(camera.rotation, 'y', 0, Math.PI * 2).step(0.1)
     camRot.add(camera.rotation, 'z', 0, Math.PI * 2).step(0.1)
-    camPos.add(camera.position, 'x', -3000, 3000).step(0.1)
-    camPos.add(camera.position, 'y', -3000, 3000).step(0.1)
-    camPos.add(camera.position, 'z', -3000, 3000).step(0.1)
+    camPos.add(camera.position, 'x', -20000, 20000).step(0.1)
+    camPos.add(camera.position, 'y', -20000, 20000).step(0.1)
+    camPos.add(camera.position, 'z', -20000, 20000).step(0.1)
     
     // const objFolder = gui.addFolder('Objects')
     // objFolder.add(pos1.position, 'x', -3000, 3000).step(0.1)
@@ -317,6 +317,7 @@ const MainCanvas = () => {
     const spriteTex = texLoader.load( '/textures/Circle1.png' );
 		const sprite1 = new THREE.Sprite( new THREE.SpriteMaterial( { map: spriteTex, color: '#fff' , sizeAttenuation: false} ) );
     sprite1.position.set(0,10,10);
+    sprite1.center.set( 0.5, 0.5 );
     sprite1.scale.set( .07, .07 ,.07 );
     pos1.add( sprite1 );
     group.add( pos1 )
@@ -324,7 +325,7 @@ const MainCanvas = () => {
     const sprite2 = new THREE.Sprite( new THREE.SpriteMaterial( { map: spriteTex, color: '#fff', sizeAttenuation: false } ) );
     sprite2.material.rotation = Math.PI / 3 * 4;
     sprite2.position.set( 8, - 2, 2 );
-    sprite2.center.set( 0.5, 0 );
+    sprite2.center.set( 0.5, 0.5 );
     sprite2.scale.set(.1, .1, .1 );
     pos2.add( sprite2 );
     group.add( pos2 )
@@ -332,7 +333,7 @@ const MainCanvas = () => {
     const sprite3 = new THREE.Sprite( new THREE.SpriteMaterial( {map: spriteTex, color: '#fff' , sizeAttenuation: false} ) );
     sprite3.position.set( 0, 2, 5 );
     sprite3.scale.set( .1, .1, .1 );
-    sprite3.center.set( - 0.1, 0 );
+    sprite3.center.set( 0.5, 0.5 );
     sprite3.material.rotation = Math.PI / 3;
     pos3.add( sprite3 );
     group.add( pos3 )
@@ -444,8 +445,8 @@ const MainCanvas = () => {
         }
       });
     });
-    shape.scale.set(7,7,7)
-    shape.position.set(0,350,-3500)
+    shape.scale.set(10 ,10  ,10)
+    shape.position.set(-250,800,-5200)
 
     scene.add(shape)
 

@@ -55,7 +55,7 @@ const Work = () => {
 
         <GalleryCard
           title="Singularity"
-          imageUrl="meetingHill.jpg"
+          imageUrl="Singularity-Edit.gif"
           link="/Singularity/"
           linkText="Line loot pinnace ahoy scurvy Jolly Roger squiffy clap of thunder
             code of conduct Shiver me timbers. "

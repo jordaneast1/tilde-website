@@ -56,14 +56,18 @@ const MainCanvas = () => {
   let pmremGenerator = useRef();
   let landscape = useRef();
   let text1 = useRef();
+  let text2 = useRef();
+  let text3 = useRef();
+
   let exrLoader = useRef();
 
   const params = {
-    enable: true,
+    enable: false,
     sobelOpacity: 0.0,
     greyscaleOpacity: 0.0,
     pixelSize: 2.0,
-    enableOrbitControls: true
+    enableOrbitControls: true,
+    sizeScalar: 0.01
   };
 
   const transitions = {
@@ -92,11 +96,37 @@ const MainCanvas = () => {
   let pos1 = new THREE.Object3D();
   let pos2 = new THREE.Object3D();
   let pos3 = new THREE.Object3D();
-  pos1.position.set(-3500,600,-5200);
-  pos2.position.set(-250,1500,-5200);
-  pos3.position.set (3250,600,-5200);
+  pos1.position.set(-2500,900,-7200);
+  pos2.position.set(-250,1500,-5300);
+  pos3.position.set (1250,600,-4200);
 
-  let raycasted = []
+  let camPosHome = new THREE.Vector3(-87.33, 124.15 ,0)
+  let camPos1 = new THREE.Vector3(-4651.66, 158.04, -12590.12)
+  let camPos2= new THREE.Vector3(-87.33, 124.15 ,-1000)
+  let camPos3 = new THREE.Vector3(6556.89, -50.71, -4353.57)
+  // pos1.position.set(camPos1.x,camPos1.y,camPos1.z);
+  // pos2.position.set(camPos2.x,camPos2.y,camPos2.z);
+  // pos3.position.set (camPos3.x,camPos3.y,camPos3.z)
+
+
+
+  let interactiveObjects = []
+  let intersects = []
+  let tweener1 = {x:0}
+  let tweener2 = {x:0}
+  let tweener3 = {x:0}
+  let tweeners = [tweener1,tweener2,tweener3]
+  let tween1 = new TWEEN.Tween(tweener1)
+  let tween2 = new TWEEN.Tween(tweener2)
+  let tween3 = new TWEEN.Tween(tweener3)
+  let tween1rev = new TWEEN.Tween(tweener1)
+  let tween2rev = new TWEEN.Tween(tweener2)
+  let tween3rev = new TWEEN.Tween(tweener3)
+  let tweens = [tween1,tween2,tween3]
+  let tweensRev = [tween1rev,tween2rev,tween3rev]
+  let index = null
+  let scaleinit = 0.04
+  let scalemult = .15
 
 
   useEffect(() => {
@@ -176,12 +206,32 @@ const MainCanvas = () => {
       var vec = new THREE.Vector3();
       camera.getWorldDirection(vec)
 
+      
       if (controlsOn){
         controls.enable = params.enableOrbitControls
         controls.update();
       }
+
+      checkInteraction()
+      moveCamera()
+
+      
+      const scaler = 0.00001
       text1.setRotationFromMatrix(camera.matrix)
+      text1.material.opacity = tweener1.x
+      // let t1scale = camera.position.distanceTo( text1.position )*params.sizeScalar;
+      // text1.scale.set(t1scale,t1scale,t1scale)
       text1.sync()
+      text2.setRotationFromMatrix(camera.matrix)
+      text2.material.opacity = tweener2.x
+      // let t2scale = camera.position.distanceTo( text2.position )*params.sizeScalar;
+      // text2.scale.set(t2scale,t2scale,t2scale)
+      text2.sync()
+      text3.setRotationFromMatrix(camera.matrix)
+      text3.material.opacity = tweener3.x
+      // let t3scale = camera.position.distanceTo( text3.position )*params.sizeScalar;
+      // text2.scale.set(t3scale,t3scale,t3scale)
+      text3.sync()
 
       TWEEN.update()
       requestAnimationFrame(animate)
@@ -237,6 +287,8 @@ const MainCanvas = () => {
       resize()
     })
     // window.addEventListener( 'mousemove', onMouseMove, false );
+    window.addEventListener( 'mousedown', onMouseDown, false );
+
     window.addEventListener('scroll', handleScroll)
 
     // postprocessing
@@ -278,14 +330,15 @@ const MainCanvas = () => {
     var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
     var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
     var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
+    var sizeScalar = gui.add( params, 'sizeScalar' ).min( 0 ).max( .02 ).step( 0.000001 );
 
     const camFolder = gui.addFolder('Camera')
     const camPos = camFolder.addFolder('Position')
     const camRot = camFolder.addFolder('Rotation')
     camFolder.add( params, 'enableOrbitControls' );
-    camRot.add(camera.rotation, 'x', 0, Math.PI * 2).step(0.1)
-    camRot.add(camera.rotation, 'y', 0, Math.PI * 2).step(0.1)
-    camRot.add(camera.rotation, 'z', 0, Math.PI * 2).step(0.1)
+    camRot.add(camera.rotation, 'x', 0, Math.PI * 2).step(0.01)
+    camRot.add(camera.rotation, 'y', 0, Math.PI * 2).step(0.01)
+    camRot.add(camera.rotation, 'z', 0, Math.PI * 2).step(0.01)
     camPos.add(camera.position, 'x', -20000, 20000).step(0.1)
     camPos.add(camera.position, 'y', -20000, 20000).step(0.1)
     camPos.add(camera.position, 'z', -20000, 20000).step(0.1)
@@ -316,29 +369,29 @@ const MainCanvas = () => {
     scene.add( group );
     const spriteTex = texLoader.load( '/textures/Circle1.png' );
 		const sprite1 = new THREE.Sprite( new THREE.SpriteMaterial( { map: spriteTex, color: '#fff' , sizeAttenuation: false} ) );
-    sprite1.position.set(0,10,10);
+    //sprite1.position.set(0,10,10);
     sprite1.center.set( 0.5, 0.5 );
-    sprite1.scale.set( .07, .07 ,.07 );
+    sprite1.scale.set( scaleinit,scaleinit,scaleinit );
     pos1.add( sprite1 );
     group.add( pos1 )
 
     const sprite2 = new THREE.Sprite( new THREE.SpriteMaterial( { map: spriteTex, color: '#fff', sizeAttenuation: false } ) );
     sprite2.material.rotation = Math.PI / 3 * 4;
-    sprite2.position.set( 8, - 2, 2 );
+    //sprite2.position.set( 8, - 2, 2 );
     sprite2.center.set( 0.5, 0.5 );
-    sprite2.scale.set(.1, .1, .1 );
+    sprite2.scale.set(scaleinit,scaleinit,scaleinit  );
     pos2.add( sprite2 );
     group.add( pos2 )
 
     const sprite3 = new THREE.Sprite( new THREE.SpriteMaterial( {map: spriteTex, color: '#fff' , sizeAttenuation: false} ) );
-    sprite3.position.set( 0, 2, 5 );
-    sprite3.scale.set( .1, .1, .1 );
+    //sprite3.position.set( 0, 2, 5 );
+    sprite3.scale.set( scaleinit,scaleinit,scaleinit );
     sprite3.center.set( 0.5, 0.5 );
     sprite3.material.rotation = Math.PI / 3;
     pos3.add( sprite3 );
     group.add( pos3 )
 
-    raycasted = [sprite1,sprite2,sprite3]
+    interactiveObjects = [sprite1,sprite2,sprite3]
     document.addEventListener( 'pointermove', onPointerMove );
 
   }
@@ -346,18 +399,16 @@ const MainCanvas = () => {
   //pointer interaction
   function onPointerMove( event ) {
 
-    if ( selectedObject ) {
-      selectedObject.material.color.set( '#fff' );
-      selectedObject = null;
-    }
-
     pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
     raycaster.setFromCamera( pointer, camera );
-    const intersects = raycaster.intersectObjects( raycasted, true );
+    intersects = raycaster.intersectObjects( interactiveObjects, true );
+  }
 
+  const checkInteraction = () => {
     if ( intersects.length > 0 ) {
+      //found object
       const res = intersects.filter( function ( res ) {
         return res && res.object;
       } )[ 0 ];
@@ -365,13 +416,149 @@ const MainCanvas = () => {
         selectedObject = res.object;
         selectedObject.material.color.set( '#69f' );
         
-        let tweener = {x:.1}
-        new TWEEN.Tween(tweener).to({x:.2}, 1000).easing(TWEEN.Easing.Quadratic.Out).onUpdate(() => {
-          //selectedObject.scale.set(tweener.x,tweener.x,tweener.x)
-        })
-        .start() // Start the tween immediately.
+        document.body.style.cursor = "pointer"
 
+        const prevIndex = index
+        index = interactiveObjects.indexOf(res.object);
+        if (index != prevIndex){
+          if (tweens[index].isPlaying()){
 
+            console.log("already playing")
+
+          } else {
+            console.log("start tween", index)
+            // individual Animations
+            if (index == 0) {
+                tween1rev.stop()
+                tween1.to({x:1}, 1000).easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(() => {
+                  const scale = (tweener1.x*scalemult)+scaleinit
+                  interactiveObjects[0].scale.set(scale,scale,scale)
+                 })
+                .start()
+
+            } else if (index == 1) {
+                tween2rev.stop()
+                tween2.to({x:1}, 1000).easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(() => {
+                  const scale = (tweener2.x*scalemult)+scaleinit
+                  interactiveObjects[1].scale.set(scale,scale,scale)   
+                })
+                .start()
+
+            } else if (index == 2) {
+                tween3rev.stop()
+                tween3.to({x:1}, 1000).easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(() => {
+                  const scale = (tweener3.x*scalemult)+scaleinit
+                  interactiveObjects[2].scale.set(scale,scale,scale)      
+                })
+                .start()
+            }     
+          }
+        }
+      }
+    } else {
+      //no intersection
+      if ( selectedObject ) {
+        document.body.style.cursor = "auto"
+        if (index != null){
+          if (tweensRev[index].isPlaying()){
+           console.log("rev already playing")
+          }  else {
+            console.log("reverse tween ", index)
+
+            if (index == 0) {
+              tween1.stop()
+              tween1rev.to({x:0}, 1000).easing(TWEEN.Easing.Quadratic.Out)
+              .onUpdate(() => {
+                const scale = (tweener1.x*scalemult)+scaleinit
+                interactiveObjects[0].scale.set(scale,scale,scale)
+              })
+              .start()
+
+            } else if (index == 1) {
+                tween2.stop()
+                tween2rev.to({x:0}, 1000).easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(() => {
+                  const scale = (tweener2.x*scalemult)+scaleinit
+                  interactiveObjects[1].scale.set(scale,scale,scale)
+                })
+                .start()
+
+            } else if (index == 2) {
+                tween3.stop()
+                tween3rev.to({x:0}, 1000).easing(TWEEN.Easing.Quadratic.Out)
+                .onUpdate(() => {
+                  const scale = (tweener3.x*scalemult)+scaleinit
+                  interactiveObjects[2].scale.set(scale,scale,scale)
+                })
+                .start()
+            }     
+          }
+          index = null
+        }
+        
+        selectedObject.material.color.set( '#fff' );
+        selectedObject = null;
+        
+      }
+    }
+  }
+
+  const moveCamera = () => {
+    let finallerp = new THREE.Vector3(0,0,0)
+    let finallerplookat = new THREE.Vector3(0,0,0)
+
+    let combinedlerp = new THREE.Vector3(0,0,0)
+
+    let finallerp1 = new THREE.Vector3(0,0,0)
+    let finallerp2 = new THREE.Vector3(0,0,0)
+    let lerp1 = new THREE.Vector3(0,0,0)
+    let lerp2 = new THREE.Vector3(0,0,0)
+    let lerp3 = new THREE.Vector3(0,0,0)
+    lerp1.lerpVectors(camPosHome,camPos1, tweener1.x*.3)
+    lerp2.lerpVectors(camPosHome,camPos2, tweener2.x)
+    lerp3.lerpVectors(camPosHome,camPos3, tweener3.x)
+    
+    let factor1 = (tweener1.x + tweener2.x)/2
+    let factor2 = (tweener1.x + tweener3.x)/2
+    let factor3 = (factor1 + factor2)/2
+
+    finallerp1.lerpVectors(lerp1, lerp2, factor1)
+    finallerp2.lerpVectors(lerp1, lerp3, factor2)
+
+    combinedlerp.lerpVectors(finallerp1, finallerp2, factor3)
+    
+    finallerp.lerpVectors(camPosHome, combinedlerp, .2)
+    finallerplookat.lerpVectors(camPosHome, combinedlerp, .1)
+
+    camera.position.set(finallerp.x, finallerp.y, finallerp.z)
+    // console.log(factor3)
+
+    camera.lookAt(shape.position)
+
+  }
+  
+  const onMouseDown = (event) => {
+    if(selectedObject){
+      let index = interactiveObjects.indexOf(selectedObject)
+      console.log(index)
+      let tempPos = new THREE.Vector3()
+      tempPos = camPosHome
+
+      if (index == 0) {
+        window.location.replace('/#about-header');
+        camPosHome = camPos1
+        camPos1 = tempPos
+      } else if (index == 1) {
+        window.location.replace('/#work-header');
+        camPosHome = camPos2
+        camPos2 = tempPos
+      } else if (index == 2) {
+        window.location.replace('/#contact-header');
+        camPosHome = camPos3
+        camPos3 = tempPos
       }
     }
   }
@@ -380,9 +567,9 @@ const MainCanvas = () => {
     const robotolight = "/Roboto-Light.ttf"//https://fonts.googleapis.com/css2?family=Roboto:wght@300"
     text1 = new Text()
     pos1.add(text1)
-    text1.position.set(0,450,0)
+    text1.position.set(0,100,10)
     // Set properties to configure:
-    text1.text = 'WORK'
+    text1.text = 'ABOUT'
     text1.anchorX = 'center'
     text1.fontSize = 200
     text1.color = 0xFFFFFF
@@ -390,6 +577,32 @@ const MainCanvas = () => {
     text1.font = robotolight
     text1.setRotationFromMatrix(camera.matrix)
     text1.sync()
+
+    text2 = new Text()
+    pos2.add(text2)
+    text2.position.set(0,100,10)
+    // Set properties to configure:
+    text2.text = 'WORK'
+    text2.anchorX = 'center'
+    text2.fontSize = 200
+    text2.color = 0xFFFFFF
+    text2.letterSpacing = .2
+    text2.font = robotolight
+    text2.setRotationFromMatrix(camera.matrix)
+    text2.sync()
+
+    text3 = new Text()
+    pos3.add(text3)
+    text3.position.set(0,100,10)
+    // Set properties to configure:
+    text3.text = 'CONTACT'
+    text3.anchorX = 'center'
+    text3.fontSize = 150
+    text3.color = 0xFFFFFF
+    text3.letterSpacing = .2
+    text3.font = robotolight
+    text3.setRotationFromMatrix(camera.matrix)
+    text3.sync()
   }
 
   //init functions
@@ -409,8 +622,10 @@ const MainCanvas = () => {
     controls.maxPolarAngle = Math.PI // 2
     controls.panSpeed = 10
     //controls.target = shape.position
-    camera.position.set(282.7908329, 1.21828,  -40.18255)
-    camera.rotation.set(0.11984934600336096, -6.12323399573676, -0.992792090149074)
+    camera.position.set(camPosHome)
+    camera.lookAt(camPos1)
+
+    // camera.rotation.set(0.11984934600336096, -6.12323399573676, -0.992792090149074)
     controls.update()
     
   }
@@ -580,8 +795,8 @@ const MainCanvas = () => {
     mouse.x = ( event.clientX - windowHalf );
     mouse.y = ( event.clientY - windowHalf );
     //console.log(mouse.x, mouse.y)
-  
   }
+
   
   const handleScroll = () => { 
     targetScrollPos = getVerticalScrollNormalised(document.body)

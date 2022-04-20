@@ -36,6 +36,9 @@ const StyledDiv = styled.div`
 const MainCanvas = () => {
 
   const threeElement = useRef()
+
+  let loadingscreen = useRef()
+
   let texLoader = useRef();
   let loader = useRef()
   let objloader = useRef()
@@ -287,6 +290,11 @@ const MainCanvas = () => {
     });
 
     pmremGenerator.dispose();
+
+    loadingscreen.classList.add( 'fade-out' );
+		
+		// optional: remove loader from DOM via event listener
+		loadingscreen.addEventListener( 'transitionend', onTransitionEnd );
   
   };
 
@@ -312,6 +320,19 @@ const MainCanvas = () => {
     camera = new THREE.PerspectiveCamera(50, w / h, .1, 50000)
    
     threeElement.current.appendChild(renderer.domElement)
+
+    //create loading screen
+    loadingscreen = document.createElement('section')
+    loadingscreen.className = 'loading-screen'
+    threeElement.current.appendChild(loadingscreen)
+    var loadingscreenicon = document.createElement('div')
+    loadingscreenicon.className = 'loader'
+    loadingscreen.appendChild(loadingscreenicon)
+    var svg = document.createElement('img')
+    svg.classList = 'svg-icon'
+    svg.src = '/tilde-logo.svg'
+    loadingscreenicon.appendChild(svg)
+
     window.addEventListener('resize', () => {
       resize()
     })
@@ -349,7 +370,7 @@ const MainCanvas = () => {
     effectPixel.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
     composer.addPass( effectPixel );
 
-    initGUI()
+    // initGUI()
   }
 
   const initGUI = () => {
@@ -575,9 +596,9 @@ const MainCanvas = () => {
   const onMouseDown = (event) => {
    
     if(selectedObject){
+      
       let index = interactiveObjects.indexOf(selectedObject)
 
-      console.log(index)
       if (camIndex == index){
         currentCamPos = camPosHome
         camIndex = -1
@@ -981,7 +1002,11 @@ const MainCanvas = () => {
     return (elm.scrollTop || p.scrollTop) / (p.scrollHeight - p.clientHeight )
   }
 
- 
+  function onTransitionEnd( event ) {
+
+    // event.target.remove();
+    
+  } 
 
 
   const resize = () => {

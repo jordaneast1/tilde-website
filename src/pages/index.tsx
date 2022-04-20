@@ -54,7 +54,6 @@ font-size: 60px;
 margin: auto;
 
 `
-
 const home = () => {
   // let AOS;
 
@@ -107,7 +106,7 @@ return (
       <meta property="og:description" content={seo.description} />
       <meta property="og:type" content="website" />
     </Helmet>
-    
+
     <MainCanvas />
     
     <Blank><ArrowDown to="/#work-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>

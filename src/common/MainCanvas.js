@@ -73,7 +73,7 @@ const MainCanvas = () => {
     greyscaleOpacity: 0.0,
     pixelSize: 2.0,
     enableOrbitControls: true,
-    sizeScalar: 0.01
+    sizeScalar: .035
   };
 
   const transitions = {
@@ -85,7 +85,7 @@ const MainCanvas = () => {
     pixelPosOut: 1 
   }
 
-  let controlsOn = true;
+  let controlsOn = false;
 
   let targetScrollPos = 0;
   let scrollPos = 0;
@@ -106,6 +106,8 @@ const MainCanvas = () => {
   pos2.position.set(-250,1500,-5300);
   pos3.position.set (1250,600,-4200);
 
+  let camIndex = -1
+  let currentCamPos = new THREE.Vector3(-87.33, 124.15 ,0)
   let camPosHome = new THREE.Vector3(-87.33, 124.15 ,0)
   let camPos1 = new THREE.Vector3(-4651.66, 158.04, -12590.12)
   let camPos2= new THREE.Vector3(-87.33, 124.15 ,-1000)
@@ -133,6 +135,8 @@ const MainCanvas = () => {
   let index = null
   let scaleinit = 0.04
   let scalemult = .15
+  let transition = {v:0, on:false}
+  let transitionTween = new TWEEN.Tween(transition)
 
 
   useEffect(() => {
@@ -216,36 +220,50 @@ const MainCanvas = () => {
 
       
       if (controlsOn){
-        controls.enable = params.enableOrbitControls
+        controls.enable = true
         controls.update();
       }
 
       checkInteraction()
-      moveCamera()
-
       
+      moveCamera()
+      
+
+      var tempVec  = new THREE.Vector3(0,0,0)
       const scaler = 0.00001
       text1.setRotationFromMatrix(camera.matrix)
       text1.material.opacity = tweener1.x
-      // let t1scale = camera.position.distanceTo( text1.position )*params.sizeScalar;
-      // text1.scale.set(t1scale,t1scale,t1scale)
+      text1.getWorldPosition(tempVec)
+      let t1scale = getSizeFromFOV(params.sizeScalar,camera.position.distanceTo(tempVec))
+      text1.scale.set(t1scale,t1scale,t1scale)
       text1.sync()
       text2.setRotationFromMatrix(camera.matrix)
       text2.material.opacity = tweener2.x
-      // let t2scale = camera.position.distanceTo( text2.position )*params.sizeScalar;
-      // text2.scale.set(t2scale,t2scale,t2scale)
+      text2.getWorldPosition(tempVec)
+      let t2scale = getSizeFromFOV(params.sizeScalar,camera.position.distanceTo(tempVec))
+      text2.scale.set(t2scale,t2scale,t2scale)
       text2.sync()
+
       text3.setRotationFromMatrix(camera.matrix)
       text3.material.opacity = tweener3.x
-      // let t3scale = camera.position.distanceTo( text3.position )*params.sizeScalar;
-      // text2.scale.set(t3scale,t3scale,t3scale)
+      text3.getWorldPosition(tempVec)
+      let t3scale = getSizeFromFOV(params.sizeScalar,camera.position.distanceTo(tempVec))
+      // console.log(t3scale, d)
+      text3.scale.set(t3scale,t3scale,t3scale)
       text3.sync()
-
+     
       TWEEN.update()
       requestAnimationFrame(animate)
     }
     animate()
   }, [])
+
+  const getSizeFromFOV = (size, dist) => {
+    var vFOV = THREE.MathUtils.degToRad( camera.fov ); // convert vertical fov to radians
+    var height = 2 * Math.tan( vFOV / 2 ) * dist; // visible height
+    var width = height * camera.aspect;           // visible width
+    return size*height    
+  }
 
   THREE.DefaultLoadingManager.onLoad = function ( ) {
   
@@ -253,7 +271,6 @@ const MainCanvas = () => {
     skyBoxTex.rotation = Math.PI;
     const env = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
     skyBoxBGTex.rotation = Math.PI;
-    //const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
     const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
     
     scene.background = BGenv;
@@ -342,7 +359,7 @@ const MainCanvas = () => {
     var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
     var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
     var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
-    var sizeScalar = gui.add( params, 'sizeScalar' ).min( 0 ).max( .02 ).step( 0.000001 );
+    var sizeScalar = gui.add( params, 'sizeScalar' ).min( 0 ).max( 2 ).step( .0001 );
 
     const camFolder = gui.addFolder('Camera')
     const camPos = camFolder.addFolder('Position')
@@ -419,7 +436,7 @@ const MainCanvas = () => {
   }
 
   const checkInteraction = () => {
-    if ( intersects.length > 0 ) {
+    if (( intersects.length > 0 ) && (!transition.on)){
       //found object
       const res = intersects.filter( function ( res ) {
         return res && res.object;
@@ -435,10 +452,10 @@ const MainCanvas = () => {
         if (index != prevIndex){
           if (tweens[index].isPlaying()){
 
-            console.log("already playing")
+            // console.log("already playing")
 
           } else {
-            console.log("start tween", index)
+            // console.log("start tween", index)
             // individual Animations
             if (index == 0) {
                 tween1rev.stop()
@@ -476,9 +493,9 @@ const MainCanvas = () => {
         document.body.style.cursor = "auto"
         if (index != null){
           if (tweensRev[index].isPlaying()){
-           console.log("rev already playing")
+          //  console.log("rev already playing")
           }  else {
-            console.log("reverse tween ", index)
+            // console.log("reverse tween ", index)
 
             if (index == 0) {
               tween1.stop()
@@ -520,58 +537,76 @@ const MainCanvas = () => {
 
   const moveCamera = () => {
     let finallerp = new THREE.Vector3(0,0,0)
-    let finallerplookat = new THREE.Vector3(0,0,0)
 
-    let combinedlerp = new THREE.Vector3(0,0,0)
+    if (!transition.on){
+      let combinedlerp = new THREE.Vector3(0,0,0)
 
-    let finallerp1 = new THREE.Vector3(0,0,0)
-    let finallerp2 = new THREE.Vector3(0,0,0)
-    let lerp1 = new THREE.Vector3(0,0,0)
-    let lerp2 = new THREE.Vector3(0,0,0)
-    let lerp3 = new THREE.Vector3(0,0,0)
-    lerp1.lerpVectors(camPosHome,camPos1, tweener1.x*.3)
-    lerp2.lerpVectors(camPosHome,camPos2, tweener2.x)
-    lerp3.lerpVectors(camPosHome,camPos3, tweener3.x)
+      let finallerp1 = new THREE.Vector3(0,0,0)
+      let finallerp2 = new THREE.Vector3(0,0,0)
+      let lerp1 = new THREE.Vector3(0,0,0)
+      let lerp2 = new THREE.Vector3(0,0,0)
+      let lerp3 = new THREE.Vector3(0,0,0)
+      lerp1.lerpVectors(currentCamPos,camPos1, tweener1.x*.3)
+      lerp2.lerpVectors(currentCamPos,camPos2, tweener2.x)
+      lerp3.lerpVectors(currentCamPos,camPos3, tweener3.x)
+      
+      let factor1 = (tweener1.x + tweener2.x)/2
+      let factor2 = (tweener1.x + tweener3.x)/2
+      let factor3 = (factor1 + factor2)/2
+
+      finallerp1.lerpVectors(lerp1, lerp2, factor1)
+      finallerp2.lerpVectors(lerp1, lerp3, factor2)
+
+      combinedlerp.lerpVectors(finallerp1, finallerp2, factor3)
+      
+      finallerp.lerpVectors(currentCamPos, combinedlerp, .2)
+
+     
+    } else {
+      finallerp.lerpVectors(camera.position, currentCamPos, transition.v)
+    } 
     
-    let factor1 = (tweener1.x + tweener2.x)/2
-    let factor2 = (tweener1.x + tweener3.x)/2
-    let factor3 = (factor1 + factor2)/2
-
-    finallerp1.lerpVectors(lerp1, lerp2, factor1)
-    finallerp2.lerpVectors(lerp1, lerp3, factor2)
-
-    combinedlerp.lerpVectors(finallerp1, finallerp2, factor3)
-    
-    finallerp.lerpVectors(camPosHome, combinedlerp, .2)
-    finallerplookat.lerpVectors(camPosHome, combinedlerp, .1)
-
     camera.position.set(finallerp.x, finallerp.y, finallerp.z)
-    // console.log(factor3)
-
     camera.lookAt(shape.position)
 
+    // console.log(factor3)
   }
   
   const onMouseDown = (event) => {
+   
     if(selectedObject){
       let index = interactiveObjects.indexOf(selectedObject)
-      console.log(index)
-      let tempPos = new THREE.Vector3()
-      tempPos = camPosHome
 
-      if (index == 0) {
-        window.location.replace('/#about-header');
-        camPosHome = camPos1
-        camPos1 = tempPos
-      } else if (index == 1) {
-        window.location.replace('/#work-header');
-        camPosHome = camPos2
-        camPos2 = tempPos
-      } else if (index == 2) {
-        window.location.replace('/#contact-header');
-        camPosHome = camPos3
-        camPos3 = tempPos
+      console.log(index)
+      if (camIndex == index){
+        currentCamPos = camPosHome
+        camIndex = -1
+      } else {
+        if (index == 0) {
+          window.location.replace('/#about-header');
+          currentCamPos = camPos1
+          camIndex = index
+        } else if (index == 1) {
+          window.location.replace('/#work-header');
+          currentCamPos = camPos2
+          camIndex = index
+        } else if (index == 2) {
+          window.location.replace('/#contact-header');
+          currentCamPos = camPos3
+          camIndex = index
+        }
       }
+
+      if (!transition.on){
+        transition.on = true
+        transitionTween.to({v:1}, 2000).easing(TWEEN.Easing.Quadratic.InOut)
+        .onComplete(()=>{
+           transition.on = false
+           transition.v = 0;
+         })
+        .start()
+      }
+      
     }
   }
 
@@ -579,11 +614,12 @@ const MainCanvas = () => {
     const robotolight = "/Roboto-Light.ttf"//https://fonts.googleapis.com/css2?family=Roboto:wght@300"
     text1 = new Text()
     pos1.add(text1)
-    text1.position.set(0,100,10)
-    // Set properties to configure:
+    text1.position.set(0,0,0)
+    text1.depthOffset = -10
     text1.text = 'ABOUT'
     text1.anchorX = 'center'
-    text1.fontSize = 200
+    text1.anchorY = 'middle'
+    text1.fontSize = 1
     text1.color = 0xFFFFFF
     text1.letterSpacing = .2
     text1.font = robotolight
@@ -592,11 +628,12 @@ const MainCanvas = () => {
 
     text2 = new Text()
     pos2.add(text2)
-    text2.position.set(0,100,10)
-    // Set properties to configure:
+    text2.position.set(0,0,0)
+    text2.depthOffset = -10
     text2.text = 'WORK'
     text2.anchorX = 'center'
-    text2.fontSize = 200
+    text2.anchorY = 'middle'
+    text2.fontSize = 1
     text2.color = 0xFFFFFF
     text2.letterSpacing = .2
     text2.font = robotolight
@@ -604,12 +641,14 @@ const MainCanvas = () => {
     text2.sync()
 
     text3 = new Text()
+
     pos3.add(text3)
-    text3.position.set(0,100,10)
-    // Set properties to configure:
+    text3.position.set(0,0,0)
+    text3.depthOffset = -10
     text3.text = 'CONTACT'
     text3.anchorX = 'center'
-    text3.fontSize = 150
+    text3.anchorY = 'middle'
+    text3.fontSize = .75
     text3.color = 0xFFFFFF
     text3.letterSpacing = .2
     text3.font = robotolight
@@ -635,7 +674,7 @@ const MainCanvas = () => {
     controls.panSpeed = 10
     //controls.target = shape.position
     camera.position.set(camPosHome)
-    camera.lookAt(camPos1)
+    // camera.lookAt(camPos1)
 
     // camera.rotation.set(0.11984934600336096, -6.12323399573676, -0.992792090149074)
     controls.update()
@@ -666,7 +705,7 @@ const MainCanvas = () => {
       object.traverse( function ( child ) {
 
         if ( child.isMesh ) {
-          const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color(0x4), roughness:0.9, roughnessMap: tilderoughness, map:tildealbedo, metalness: 0.3, reflectivity: 0.1})
+          const material = new THREE.MeshPhysicalMaterial({color: new THREE.Color("white"), roughness:0.9, roughnessMap: tilderoughness, map:tildealbedo, metalness: 0.3, reflectivity: 0.1})
           child.material = material // assign your diffuse texture here
       
         }

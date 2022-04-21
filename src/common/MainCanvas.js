@@ -310,15 +310,6 @@ const MainCanvas = () => {
     renderer.setSize(w, h)
     //renderer.setClearColor('#000')
 
-    pmremGenerator = new THREE.PMREMGenerator( renderer );
-    pmremGenerator.compileEquirectangularShader();
-
-    skyBoxTex = exrLoader.load( '/textures/Skybox2k_zip.exr'); 
-    skyBoxBGTex = texLoader.load( '/textures/SkyboxBackground.jpg');
-    //skyBoxBGTex = rgbeLoader.load( '/textures/SkyboxNewRGBE.hdr');
-    //camera
-    camera = new THREE.PerspectiveCamera(50, w / h, .1, 50000)
-   
     threeElement.current.appendChild(renderer.domElement)
 
     //create loading screen
@@ -332,6 +323,16 @@ const MainCanvas = () => {
     svg.classList = 'svg-icon'
     svg.src = '/tilde-logo.svg'
     loadingscreenicon.appendChild(svg)
+   
+    pmremGenerator = new THREE.PMREMGenerator( renderer );
+    pmremGenerator.compileEquirectangularShader();
+
+    skyBoxTex = exrLoader.load( '/textures/Skybox2k_zip.exr'); 
+    skyBoxBGTex = texLoader.load( '/textures/SkyboxBackground.jpg');
+    //skyBoxBGTex = rgbeLoader.load( '/textures/SkyboxNewRGBE.hdr');
+    //camera
+    camera = new THREE.PerspectiveCamera(50, w / h, .1, 50000)
+   
 
     window.addEventListener('resize', () => {
       resize()
@@ -1004,7 +1005,7 @@ const MainCanvas = () => {
 
   function onTransitionEnd( event ) {
 
-    // event.target.remove();
+    event.target.remove();
     
   } 
 

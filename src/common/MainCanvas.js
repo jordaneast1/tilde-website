@@ -284,7 +284,7 @@ const MainCanvas = () => {
       if ( child.isMesh ) {
         child.material.envMap = env;
         child.material.needsUpdate = true
-        console.log(child.name, child.material.color)
+        // console.log(child.name, child.material.color)
 
       }
     });
@@ -311,19 +311,8 @@ const MainCanvas = () => {
     //renderer.setClearColor('#000')
 
     threeElement.current.appendChild(renderer.domElement)
+    loadingscreen = document.getElementById('loading-screen')
 
-    //create loading screen
-    loadingscreen = document.createElement('section')
-    loadingscreen.className = 'loading-screen'
-    threeElement.current.appendChild(loadingscreen)
-    var loadingscreenicon = document.createElement('div')
-    loadingscreenicon.className = 'loader'
-    loadingscreen.appendChild(loadingscreenicon)
-    var svg = document.createElement('img')
-    svg.classList = 'svg-icon'
-    svg.src = '/tilde-logo.svg'
-    loadingscreenicon.appendChild(svg)
-   
     pmremGenerator = new THREE.PMREMGenerator( renderer );
     pmremGenerator.compileEquirectangularShader();
 
@@ -750,7 +739,6 @@ const MainCanvas = () => {
 
       loader.load( '/models/MtTildeSliced.fbx', function ( object ) {
                 
-        console.log(landscapeAlbedo)
         landscapeAlbedo.wrapS = THREE.RepeatWrapping;
         landscapeAlbedo.wrapT = THREE.RepeatWrapping;
         landscape.add(object);
@@ -823,7 +811,6 @@ const MainCanvas = () => {
 
       objloader.load( '/models/BG_Mountain1.obj', function ( object ) {
                 
-        console.log(landscapeAlbedo)
         landscapeAlbedo.wrapS = THREE.RepeatWrapping;
         landscapeAlbedo.wrapT = THREE.RepeatWrapping;
         scene.add(object);
@@ -850,7 +837,6 @@ const MainCanvas = () => {
 
       objloader.load( '/models/BG_Mountain2.obj', function ( object ) {
                 
-        console.log(landscapeAlbedo)
         landscapeAlbedo.wrapS = THREE.RepeatWrapping;
         landscapeAlbedo.wrapT = THREE.RepeatWrapping;
         scene.add(object);
@@ -877,7 +863,6 @@ const MainCanvas = () => {
       });
       objloader.load( '/models/BG_Mountain3.obj', function ( object ) {
                 
-        console.log(landscapeAlbedo)
         landscapeAlbedo.wrapS = THREE.RepeatWrapping;
         landscapeAlbedo.wrapT = THREE.RepeatWrapping;
         scene.add(object);
@@ -1028,14 +1013,14 @@ const MainCanvas = () => {
 
   THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
 
-    console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+    // console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
   
   };
     
   
   THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
   
-    console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+    // console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
   
   };
   
@@ -1045,7 +1030,27 @@ const MainCanvas = () => {
   
   };
 
-  return <StyledDiv className="App" ref={threeElement} />
+  return <div>
+    <StyledDiv className="App" ref={threeElement}>
+    <section id = 'loading-screen' className='loading-screen'>
+      <div className='loader'>
+        <img className='svg-icon' src='/tilde-logo.svg'/>
+      </div>
+    </section>
+    </StyledDiv>
+  </div>
 }
 
 export default MainCanvas
+
+//create loading screen
+// loadingscreen = document.createElement('section')
+// loadingscreen.className = 'loading-screen'
+// threeElement.current.appendChild(loadingscreen)
+// var loadingscreenicon = document.createElement('div')
+// loadingscreenicon.className = 'loader'
+// loadingscreen.appendChild(loadingscreenicon)
+// var svg = document.createElement('img')
+// svg.classList = 'svg-icon'
+// svg.src = '/tilde-logo.svg'
+// loadingscreenicon.appendChild(svg)

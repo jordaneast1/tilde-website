@@ -141,6 +141,15 @@ const MainCanvas = () => {
   let transition = {v:0, on:false}
   let transitionTween = new TWEEN.Tween(transition)
 
+  //particle system stuff
+  
+  let frame = 0
+  let geometry = new THREE.Geometry();
+  let particleMaterial = new THREE.PointsMaterial()
+  let particleSystem = new THREE.Points(geometry,particleMaterial)
+  const PARTICLE_COUNT = 1000
+  let particles = []
+
 
   useEffect(() => {
 
@@ -162,6 +171,7 @@ const MainCanvas = () => {
     initText()
     if (controlsOn){  initControls()  }
     loadPlane()
+    initSnow()
     //initTerrain()
     //initSky()
 
@@ -256,6 +266,9 @@ const MainCanvas = () => {
       text3.sync()
      
       TWEEN.update()
+
+      animateSnow()
+
       requestAnimationFrame(animate)
     }
     animate()
@@ -905,8 +918,8 @@ const MainCanvas = () => {
       envMapIntensity: 3,
       premultipliedAlpha: true,
     })
-    const geometry = new THREE.PlaneBufferGeometry(400, 400)
-    const planeMesh = new THREE.Mesh(geometry, planeMaterial)
+    const planegeo = new THREE.PlaneBufferGeometry(400, 400)
+    const planeMesh = new THREE.Mesh(planegeo, planeMaterial)
     planeMesh.receiveShadow = true
     planeMesh.rotation.set(THREE.MathUtils.degToRad(90), 0, 0)
     //scene.add(planeMesh)
@@ -965,6 +978,63 @@ const MainCanvas = () => {
     )
 
     cubeCamera.update(renderer, sky)
+  }
+
+  const initSnow = () => {
+
+    //https://github.com/hoorayimhelping/threejs-playground/blob/master/snowfall.html
+
+    
+    var snowflakeTexture = texLoader.load('/textures/snowflake.png');
+
+    // particles = [],
+    
+    const x = 6000
+    const y = 600
+    const z = 6000
+    
+    for (var i = 0; i < PARTICLE_COUNT; i++) {
+        var particle = {
+          position: new THREE.Vector3(Math.random() * x - x/2, Math.random() * y - y/2, Math.random() * z - z/2 ),
+          velocity: new THREE.Vector3(0, -500, 0)
+        };
+        particles.push(particle);
+        geometry.vertices.push(particle.position);
+    }
+
+
+    particleMaterial = new THREE.PointsMaterial({ 
+      color: '#FFF',
+      map: snowflakeTexture,
+      size: 4,
+      blending: THREE.AdditiveBlending,
+      transparent: true
+    })
+
+    particleSystem = new THREE.Points(geometry,particleMaterial)
+    particleSystem.sortParticles = true;
+    particleSystem.position.set(0,0,-0)
+    scene.add(particleSystem);
+
+
+  }
+
+  const animateSnow = () => {
+    var i = 0;
+    // console.log(frame)
+     particleSystem.rotation.y = frame / 350
+            //  particleSystem.rotation.z = frame / 500;
+
+    for (i = 0; i < PARTICLE_COUNT; i++) {
+        if (particleSystem.geometry.vertices[i].y < -250) {
+          particleSystem.geometry.vertices[i].y = 520;
+        }
+        particleSystem.geometry.vertices[i].y += particles[i].velocity.y / 7;
+        if (i==5) console.log(particleSystem.geometry.vertices[i].y )
+    }
+
+    frame++;
+    
   }
 
 // UTILITY FNCT

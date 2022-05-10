@@ -2,6 +2,11 @@ import * as React from "react";
 import styled from "styled-components";
 import GalleryCard from "../common/GalleryCard"
 
+
+const CenteredDiv = styled.div`
+display: flex;
+height:50vw;
+`;
 const Gallery = styled.section`
   background-color: white;
   color: black;
@@ -38,9 +43,14 @@ const Gallery = styled.section`
 const Work = () => {
   return (
     <div id="work-header" className="page">
+
       <Gallery data-aos="fade-down">
         <div className="page-full">
-          <h2>Work</h2>
+          {/* <h2>Work</h2> */}
+                <CenteredDiv>
+            <iframe src="https://www.youtube.com/embed/6ltKJ6FvQZY?modestbranding=1&autohide=1&showinfo=0&controls=0&rel=0&autoplay=1" width="100%" height="auto" frameBorder="0" allow="autoplay; fullscreen; picture-in-picture;" allowFullScreen ></iframe>
+          </CenteredDiv>
+
         </div>
         {/* <div className="frame" data-aos="fade-up"></div> */}
 

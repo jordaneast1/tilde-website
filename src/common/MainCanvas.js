@@ -996,7 +996,7 @@ const MainCanvas = () => {
     for (var i = 0; i < PARTICLE_COUNT; i++) {
         var particle = {
           position: new THREE.Vector3(Math.random() * x - x/2, Math.random() * y - y/2, Math.random() * z - z/2 ),
-          velocity: new THREE.Vector3(0, -500, 0)
+          velocity: new THREE.Vector3(0, -30, 0)
         };
         particles.push(particle);
         geometry.vertices.push(particle.position);
@@ -1013,7 +1013,7 @@ const MainCanvas = () => {
 
     particleSystem = new THREE.Points(geometry,particleMaterial)
     particleSystem.sortParticles = true;
-    particleSystem.position.set(0,0,-0)
+    particleSystem.position.set(0,0,-300)
     scene.add(particleSystem);
 
 
@@ -1023,16 +1023,14 @@ const MainCanvas = () => {
     var i = 0;
     // console.log(frame)
      particleSystem.rotation.y = frame / 350
-            //  particleSystem.rotation.z = frame / 500;
 
     for (i = 0; i < PARTICLE_COUNT; i++) {
         if (particleSystem.geometry.vertices[i].y < -250) {
-          particleSystem.geometry.vertices[i].y = 520;
+          particleSystem.geometry.vertices[i].y = 600;
         }
         particleSystem.geometry.vertices[i].y += particles[i].velocity.y / 7;
-        if (i==5) console.log(particleSystem.geometry.vertices[i].y )
     }
-
+    particleSystem.geometry.verticesNeedUpdate = true
     frame++;
     
   }

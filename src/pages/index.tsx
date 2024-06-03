@@ -12,6 +12,8 @@ import { Footer } from "../common/footer"
 import styled from "styled-components";
 
 import MainCanvas from "../common/MainCanvas";
+import MobileCanvas from "../common/MobileCanvas";
+
 
 import AOS from "aos";
 import "aos/dist/aos.css"; // You can also use <link> for styles
@@ -107,8 +109,13 @@ return (
       <meta property="og:type" content="website" />
     </Helmet>
 
-    <MainCanvas />
-    
+   {/* don't render 3D canvas on small screen */}
+    <>
+          { typeof window !== 'undefined' 
+            ? window.innerWidth <= 400 ?<MobileCanvas/>: <MainCanvas/> : null
+          }
+    </>
+
     <Blank><ArrowDown to="/#work-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
     <Work />
     <Blank2 />

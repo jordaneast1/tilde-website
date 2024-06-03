@@ -46,6 +46,7 @@ const ProfilePic = styled.img`
 export const About = () => {
   return (
     <div id="about-header" className="page" >
+      <div className="page-full">
       <FullPage1 className="page-full" data-aos="fade-down">
         {/* <div  className="frame"  ></div> */}
         <h1>About us</h1>
@@ -58,8 +59,6 @@ export const About = () => {
       </FullPage1>
 
       <ProfileBlock>
- 
-
           <HalfPage>
           <div className="frame" ></div>
             <h1>Pat</h1>
@@ -87,6 +86,7 @@ export const About = () => {
             </p>
           </HalfPage>
       </ProfileBlock>
+      </div>
     </div>
   );
 };

@@ -10,7 +10,7 @@ import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader'
 import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader'
 
 
-import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
+// import { GUI } from 'three/examples/jsm/libs/dat.gui.module.js';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -22,7 +22,6 @@ import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
 import { Color, Object3D } from 'three/build/three.module'
 import {Text} from 'troika-three-text'
 import {EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min'
 
 
 const StyledDiv = styled.div`
@@ -34,7 +33,8 @@ const StyledDiv = styled.div`
 `
 
 const MainCanvas = () => {
-
+  
+  const TWEEN = require('@tweenjs/tween.js');
   const threeElement = useRef()
 
   let loadingscreen = useRef()
@@ -71,7 +71,7 @@ const MainCanvas = () => {
   let rgbeLoader = useRef();
 
   const params = {
-    enable: false,
+    enable: true,
     sobelOpacity: 0.0,
     greyscaleOpacity: 0.0,
     pixelSize: 2.0,
@@ -376,45 +376,45 @@ const MainCanvas = () => {
     // initGUI()
   }
 
-  const initGUI = () => {
-    const gui = new GUI();
+  // const initGUI = () => {
+  //   const gui = new GUI();
 
-    gui.add( params, 'enable' );
-    var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
-    var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
-    var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
-    var sizeScalar = gui.add( params, 'sizeScalar' ).min( 0 ).max( 2 ).step( .0001 );
+  //   gui.add( params, 'enable' );
+  //   var sobelOpacitySlider =  gui.add( params, 'sobelOpacity', 0, 1);
+  //   var greyscaleOpacitySlider = gui.add( params, 'greyscaleOpacity', 0, 1);
+  //   var pixelSlider = gui.add( params, 'pixelSize' ).min( 2 ).max( 32 ).step( 2 );
+  //   var sizeScalar = gui.add( params, 'sizeScalar' ).min( 0 ).max( 2 ).step( .0001 );
 
-    const camFolder = gui.addFolder('Camera')
-    const camPos = camFolder.addFolder('Position')
-    const camRot = camFolder.addFolder('Rotation')
-    camFolder.add( params, 'enableOrbitControls' );
-    camRot.add(camera.rotation, 'x', 0, Math.PI * 2).step(0.01)
-    camRot.add(camera.rotation, 'y', 0, Math.PI * 2).step(0.01)
-    camRot.add(camera.rotation, 'z', 0, Math.PI * 2).step(0.01)
-    camPos.add(camera.position, 'x', -20000, 20000).step(0.1)
-    camPos.add(camera.position, 'y', -20000, 20000).step(0.1)
-    camPos.add(camera.position, 'z', -20000, 20000).step(0.1)
+  //   const camFolder = gui.addFolder('Camera')
+  //   const camPos = camFolder.addFolder('Position')
+  //   const camRot = camFolder.addFolder('Rotation')
+  //   camFolder.add( params, 'enableOrbitControls' );
+  //   camRot.add(camera.rotation, 'x', 0, Math.PI * 2).step(0.01)
+  //   camRot.add(camera.rotation, 'y', 0, Math.PI * 2).step(0.01)
+  //   camRot.add(camera.rotation, 'z', 0, Math.PI * 2).step(0.01)
+  //   camPos.add(camera.position, 'x', -20000, 20000).step(0.1)
+  //   camPos.add(camera.position, 'y', -20000, 20000).step(0.1)
+  //   camPos.add(camera.position, 'z', -20000, 20000).step(0.1)
     
-    // const objFolder = gui.addFolder('Objects')
-    // objFolder.add(pos1.position, 'x', -3000, 3000).step(0.1)
-    // objFolder.add(pos1.position, 'y', -3000, 3000).step(0.1)
-    // objFolder.add(pos1.position, 'z', -3000, 3000).step(0.1)
+  //   // const objFolder = gui.addFolder('Objects')
+  //   // objFolder.add(pos1.position, 'x', -3000, 3000).step(0.1)
+  //   // objFolder.add(pos1.position, 'y', -3000, 3000).step(0.1)
+  //   // objFolder.add(pos1.position, 'z', -3000, 3000).step(0.1)
 
-    gui.open();
+  //   gui.open();
     
-    sobelOpacitySlider.onChange(function(value){
-      effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
-    });
+  //   sobelOpacitySlider.onChange(function(value){
+  //     effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
+  //   });
 
-    greyscaleOpacitySlider.onChange(function(value){
-      effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
-    });
+  //   greyscaleOpacitySlider.onChange(function(value){
+  //     effectGrayScale.uniforms[ 'opacity' ].value = params.greyscaleOpacity;
+  //   });
 
-    pixelSlider.onChange(function(value){
-      effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
-    });
-  }
+  //   pixelSlider.onChange(function(value){
+  //     effectPixel.uniforms[ 'pixelSize' ].value = params.pixelSize;
+  //   });
+  // }
 
 
   const initInteraction = () => {
@@ -1006,15 +1006,15 @@ const MainCanvas = () => {
     particleMaterial = new THREE.PointsMaterial({ 
       color: '#FFF',
       map: snowflakeTexture,
-      size: 4,
+      size: 34,
       blending: THREE.AdditiveBlending,
       transparent: true
     })
 
     particleSystem = new THREE.Points(geometry,particleMaterial)
     particleSystem.sortParticles = true;
-    particleSystem.position.set(0,0,-300)
-    scene.add(particleSystem);
+    particleSystem.position.set(0,0,500)
+    shape.add(particleSystem);
 
 
   }

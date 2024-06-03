@@ -14,13 +14,13 @@ const Nav = () => (
         </NavListLink>
       </NavListItem>
       <NavListItem>
-        <NavListLink to="/#work-header">
-          WORK
+        <NavListLink to="/#about-header">
+          ABOUT US
         </NavListLink>
       </NavListItem>
       <NavListItem>
-        <NavListLink to="/#about-header">
-          ABOUT US
+        <NavListLink to="/#work-header">
+          WORK
         </NavListLink>
       </NavListItem>
     </NavList>

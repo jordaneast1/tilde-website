@@ -77,6 +77,7 @@ GalleryCard.propTypes = {
     linkText: PropTypes.string,
     title: PropTypes.string.isRequired,
     link: PropTypes.string,
+    category: PropTypes.string
   };
     
 export default GalleryCard;

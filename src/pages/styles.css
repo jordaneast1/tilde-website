@@ -368,3 +368,52 @@ font-style: normal;
 input[name="honeypot"] {
   display: none;
 }
+
+
+.tabs {
+  display: flex;
+  font-size: 1vw;
+  width: 70%;
+  margin: auto;
+}
+
+.tabs > .tab {
+  flex: 1;
+  display: flex;
+  :hover {
+    color: white;
+    background-color: black;
+    }
+
+  transition: 0.5s;
+}
+
+.tabs > .tab-header {
+  flex: 1;
+  display: flex;
+  padding: .5rem;
+  width: 100%;
+  text-align: right;
+
+  transition: 0.5s;
+
+}
+
+.tab > .tab-input {
+  width: 0;
+  height: 0;
+  margin: 0;
+  display: none;
+}
+
+.tab > .tab-box {
+  padding: .5rem;
+  width: 100%;
+  text-align: center;
+  
+}
+
+.tab > .tab-input:checked + .tab-box {
+  background: black;
+  color: white;
+}

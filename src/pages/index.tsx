@@ -44,6 +44,7 @@ height: 25px;
 position:fixed;
 top: 90%;
 left: 50%;
+align-text:center;
 align-self:center;
 display: block;
 color: white;

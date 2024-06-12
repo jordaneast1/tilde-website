@@ -375,14 +375,23 @@ input[name="honeypot"] {
   font-size: 1vw;
   width: 70%;
   margin: auto;
+
+  @media all and (max-width: 500px) {
+    /* On small screens, we are no longer using row direction but column */
+    width: 100%;
+    font-size: 2vw;
+  }
 }
 
 .tabs > .tab {
   flex: 1;
   display: flex;
+  text-align: center;
+
   :hover {
     color: white;
     background-color: black;
+    cursor: pointer;
     }
 
   transition: 0.5s;
@@ -409,7 +418,6 @@ input[name="honeypot"] {
 .tab > .tab-box {
   padding: .5rem;
   width: 100%;
-  text-align: center;
   
 }
 

@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import GalleryCard from "../common/GalleryCard"
-import "./styles.css"
-
-
+import GalleryCard from "../common/GalleryCard";
+import "./styles.css";
 
 const CenteredDiv = styled.div`
-display: flex;
-height:50vw;
+  display: flex;
+  height: 50vw;
 `;
+
 const Gallery = styled.section`
   background-color: white;
   color: black;
@@ -24,25 +23,17 @@ const Gallery = styled.section`
   justify-content: flex-start;
   margin: auto;
 
-  /* Medium screens */
-@media all and (max-width: 800px) {
-  .navigation {
-    /* When on medium ssized screens, we center it by evenly distributing empty space around items */
-    justify-content: space-around;
+  @media all and (max-width: 800px) {
+    .navigation {
+      justify-content: space-around;
+    }
+
+    transition: 0.5s;
   }
 
-  transition: 0.5s;
-
-}
-
-  
-
-/* Small screens */
-@media all and (max-width: 500px) {
-    /* On small screens, we are no longer using row direction but column */
+  @media all and (max-width: 500px) {
     flex-direction: column;
-  
-}
+  }
 `;
 
 const Filter = styled.div`
@@ -52,78 +43,157 @@ const Filter = styled.div`
   transition: 0.5s;
 `;
 
+const Category = styled.div`
+  position: relative;
+  z-index:1;
+  width: 1%;
+  writing-mode: vertical-lr;
+  transform: scale(-1);
+  text-align: center;
+  padding: 0.5%;
+  font-size: 1vw;
+
+  @media all and (max-width: 500px) {
+    writing-mode: horizontal-tb;
+    transform: scale(1);
+    width: 100%;
+    font-size: 2vw;
+  }
+`;
+
 const Work = () => {
-  var defaultWork = [
-    { title:"Meeting Hill", imageUrl:"meetingHill.jpg", link:"/meetingHill/", linkText:"Line loot pinnace ahoy scurvy Jolly Roger squiffy clap", category:"art"},
-    { title:"Singularity", imageUrl:"Singularity-Edit.gif", link:"/Singularity/", linkText:"Line loot pinnace ahoy", category:"art"},
-    { title:"Skate", imageUrl:"meetingHill.jpg",link:"/Skate/",linkText:"Line loot pinnace ahoy scurvy Jolly",category:"virtual-production"}
-    
-  ]
+  const defaultWork = [
+    { title: "RDS Surrender", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "RDS Visualisers", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "RDS Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "Songs For Freedom", imageUrl: "SKATE.jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "Flight Fac Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "Pat Carrol Hope", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+
+    { title: "Body Place", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
+    { title: "Being Mushroom", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
+    { title: "Dawn Coordinate", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
+    { title: "Edge Of The Present", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
+    { title: "Steam Signals", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
+
+    { title: "VAD - Thor Love & Thunder", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
+    { title: "VAD - Minecraft", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
+    { title: "FlightLight", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
+    { title: "Skate", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
+    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
+
+    { title: "Airforce", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "all" },
+    { title: "Syngenta", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "all" },
+
+  ];
 
   const [workList, setWorkList] = useState([]);
-
   const [selectedCategory, setSelectedCategory] = useState();
+  const [isFiltered, setIsFiltered] = useState(true);
+  const [rerenderKey, setRerenderKey] = useState(Date.now()); // State variable to trigger re-renders
+
+
 
   useEffect(() => {
     setWorkList(defaultWork);
   }, []);
 
-  // Function to get filtered list
-  function getFilteredList() {
-    // Avoid filter when selectedCategory is null
-    if (!selectedCategory) {
-      return workList;
-    }
-    return workList.filter((item) => item.category === selectedCategory);
+  const filteredLists = useMemo(() => {
+    const categories = ["virtual-production", "music", "art", "all"];
+    const filtered = categories.reduce((acc, category) => {
+      acc[category] = workList.filter(item => item.category === category && (!selectedCategory || selectedCategory !== category));
+      return acc;
+    }, {});
+    filtered.all = !selectedCategory ? []: workList.filter((item) => item.category === selectedCategory);
+    return filtered;
+  }, [selectedCategory, workList]);
+
+
+  function handleCategoryChange(event) {
+    const category = event.target.value;
+    setSelectedCategory(category);
+    setIsFiltered(category === 'all');
+    setRerenderKey(Date.now()); // Update the key to force re-renders
   }
 
-  // Avoid duplicate function calls with useMemo
-  var filteredList = useMemo(getFilteredList, [selectedCategory, workList]);
-  
-  function handleCategoryChange(event) {
-    setSelectedCategory(event.target.value);
-  }
+  useEffect(() => {
+    // Update all lists when isFiltered changes
+    setWorkList((filteredLists) => {
+      return filteredLists.map(item => ({ ...item }));
+    });
+   
+  }, [isFiltered]);
 
   return (
     <div id="work-header" className="page" data-aos="fade-down">
-        <div className="page-full" >
-          {/* <h2>Work</h2> */}
-          <CenteredDiv>
-            <iframe src="https://www.youtube.com/embed/6ltKJ6FvQZY?modestbranding=1&autohide=1&showinfo=0&controls=1&rel=0&autoplay=0" width="100%" height="auto" frameBorder="0" allow="autoplay; fullscreen; picture-in-picture;" allowFullScreen ></iframe>
-          </CenteredDiv>
-         
-      <Gallery>
+      <div className="page-full">
+        <CenteredDiv>
+          <iframe
+            src="https://www.youtube.com/embed/6ltKJ6FvQZY?modestbranding=1&autohide=1&showinfo=0&controls=1&rel=0&autoplay=0"
+            width="100%"
+            height="auto"
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture;"
+            allowFullScreen
+          ></iframe>
+        </CenteredDiv>
+        <Gallery>
+          <Filter>
+            <div className="tabs">
+              <label className="tab-header">
+                <div className="tab-box"><b>WE CREATE FOR</b></div>
+              </label>
+              <label className="tab">
+                <input type="radio" name="category-list" value="virtual-production" className="tab-input" onChange={handleCategoryChange} />
+                <div className="tab-box">VIRTUAL PRODUCTION</div>
+              </label>
+              <label className="tab">
+                <input type="radio" name="category-list" value="music" className="tab-input" onChange={handleCategoryChange} />
+                <div className="tab-box">MUSIC</div>
+              </label>
+              <label className="tab">
+                <input type="radio" name="category-list" value="art" className="tab-input" onChange={handleCategoryChange} />
+                <div className="tab-box">ART</div>
+              </label>
+              <label className="tab">
+                <input type="radio" name="category-list" value="all" className="tab-input" onChange={handleCategoryChange} />
+                <div className="tab-box">... IN REAL-TIME</div>
+              </label>
+            </div>
+          </Filter>
 
-        <Filter>
-        <div class="tabs">
-          <label class="tab-header">
-          <div class="tab-box">WE CREATE FOR</div>
-          </label>
-          <label class="tab">
-            <input type="radio" name="category-list" id="category-list" value="virtual-production" class="tab-input" onChange={handleCategoryChange}></input>
-            <div class="tab-box">VIRTUAL PRODUCTION</div>
-          </label>
-          <label class="tab">
-            <input type="radio" name="category-list" id="category-list" value="music" class="tab-input" onChange={handleCategoryChange}></input>
-            <div class="tab-box">MUSIC</div>
-            </label>
-            <label class="tab">
-            <input type="radio" name="category-list" id="category-list" value="art" class="tab-input" onChange={handleCategoryChange}></input>
-            <div class="tab-box">ART</div>
-            </label>
-            <label class="tab">
-            <input type="radio" name="category-list" id="category-list" value="" class="tab-input" onChange={handleCategoryChange}></input>
-            <div class="tab-box">... IN REAL-TIME</div>
-            </label>
-          </div>
-        </Filter>
-        {/* <div className="frame" data-aos="fade-up"></div> */}
+          <Category style={{ display: (selectedCategory === "all" || !selectedCategory) ? 'none' : 'block' }}>
+            {selectedCategory}
+          </Category>
 
-          {filteredList.map((element, index) => (
-          <GalleryCard {...element} key={index} />
-        ))}
+          {filteredLists.all.map((element, index) => (
+            <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
+          ))}
 
-      </Gallery>
+          <Category style={{ display: selectedCategory === "virtual-production" || selectedCategory === "all" || !selectedCategory ? 'none' : 'block' }}>
+            virtual production
+          </Category>
+
+          {filteredLists["virtual-production"].map((element, index) => (
+            <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
+          ))}
+
+          <Category style={{ display: selectedCategory === "music" || selectedCategory === "all" || !selectedCategory ? 'none' : 'block' }}>
+            music
+          </Category>
+
+          {filteredLists["music"].map((element, index) => (
+            <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
+          ))}
+
+          <Category style={{ display: selectedCategory === "art" || selectedCategory === "all" || !selectedCategory? 'none' : 'block' }}>
+            art
+          </Category>
+
+          {filteredLists["art"].map((element, index) => (
+            <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
+          ))}
+        </Gallery>
       </div>
     </div>
   );

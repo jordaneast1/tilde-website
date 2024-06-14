@@ -1,4 +1,4 @@
- 
+ //made with 0.118.3 originally 
 import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { Sky } from 'three/examples/jsm/objects/Sky.js'
@@ -17,7 +17,9 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { LuminosityShaderWithOpacity } from './Shaders/LuminosityShaderWithOpacity';
 import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
-import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
+//import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
+import { PixelShader } from './Shaders/PixelShader.js';
+
 // import { PMREMGenerator } from 'three/examples/jsm/environments'
 import { Color, Object3D } from 'three/build/three.module'
 import {Text} from 'troika-three-text'
@@ -308,7 +310,7 @@ const MainCanvas = () => {
 		
 		// optional: remove loader from DOM via event listener
 		loadingscreen.addEventListener( 'transitionend', onTransitionEnd );
-  
+
   };
 
   const initScene = () => {

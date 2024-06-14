@@ -11,7 +11,7 @@ import { Footer } from "../common/footer"
 
 import styled from "styled-components";
 
-import MainCanvas from "../common/MainCanvas";
+import MainCanvas from "../common/GaussianCanvas";
 import MobileCanvas from "../common/MobileCanvas";
 
 

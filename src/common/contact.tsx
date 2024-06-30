@@ -162,6 +162,7 @@ export const Contact = () => {
                   </form>
                   <div className="row">
                     <p> Made by ~us with Gatsby</p>
+                    <p> Thanks to mkkellogg for the <a href='https://github.com/mkkellogg/GaussianSplats3D'>GaussianSplats3D library</a> for three.js</p>
                   </div>
                 </div>
               </div>

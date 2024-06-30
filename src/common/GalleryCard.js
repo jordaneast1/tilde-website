@@ -82,7 +82,7 @@ const useWidthPercentage = (indexProp,  category, isFiltered) => {
 
   const handleResize = () => {
       const width = window.innerWidth;
-      console.log(`indexProp: ${indexProp}, category: ${category}, isFiltered: ${isFiltered}, width: ${width}`);
+      //console.log(`indexProp: ${indexProp}, category: ${category}, isFiltered: ${isFiltered}, width: ${width}`);
       //find items at the first index, given that the category is selected
       if (indexProp === 0 && !isFiltered){
         if (width <= 500) {

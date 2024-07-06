@@ -294,7 +294,10 @@ input:focus ~ label, textarea:focus ~ label, input:valid ~ label, textarea:valid
 
 input,
 textarea {
-  padding: 30px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+
   border: 0;
   width: 100%;
   font-size: 1rem;

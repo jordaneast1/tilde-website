@@ -2,7 +2,7 @@ import React from "react";
 import "../pages/styles.css";
 import styled from "styled-components";
 import { Link } from "gatsby";
-import { ModalRoutingContext } from "gatsby-plugin-modal-routing";
+import { ModalRoutingContext } from "gatsby-plugin-modal-routing-v5.0";
 
 
 const ArtworkPage = styled.section`

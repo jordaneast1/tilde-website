@@ -90,7 +90,7 @@ const MainCanvas = () => {
   let geometry = new THREE.BufferGeometry();
   let particleMaterial = new THREE.PointsMaterial()
   let particleSystem = new THREE.Points(geometry,particleMaterial)
-  const PARTICLE_COUNT = 1000
+  const PARTICLE_COUNT = 3000
 
   let then = 0;
 
@@ -300,7 +300,7 @@ const MainCanvas = () => {
   const initControls = () => {
     controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true // an animation loop is required when either damping or auto-rotation are enabled
-    controls.dampingFactor = 0.05
+    controls.dampingFactor = 0.075
     controls.autoRotate = true
     controls.autoRotateSpeed = 0.3
     controls.screenSpacePanning = false
@@ -325,9 +325,9 @@ const MainCanvas = () => {
     var snowflakeTexture = texLoader.load('/textures/snowflake.png');
   
     // Define constants
-    const x = 50;
+    const x = 40;
     const y = 50;
-    const z = 50;
+    const z = 40;
   
     // Create an array to hold the positions of the particles
     const positions = new Float32Array(PARTICLE_COUNT * 3);
@@ -354,7 +354,7 @@ const MainCanvas = () => {
     const particleMaterial = new THREE.PointsMaterial({ 
       color: '#FFF',
       map: snowflakeTexture,
-      size: 0.2,
+      size: 0.05,
       blending: THREE.AdditiveBlending,
       transparent: true
     });
@@ -376,7 +376,7 @@ const MainCanvas = () => {
     // Update the positions of the particles
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       if (positions[i * 3 + 1] < -10) {
-        positions[i * 3 + 1] = 50;
+        positions[i * 3 + 1] =  Math.random()*25 + 50;
       }
       positions[i * 3 + 1] += velocities[i * 3 + 1] / 7;
     }
@@ -405,7 +405,7 @@ const MainCanvas = () => {
 
   const handleScroll = () => { 
     targetScrollPos = getVerticalScrollNormalised(document.body)
-    console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
+    // console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
   }
   
   const getVerticalScrollNormalised = ( elm ) => {

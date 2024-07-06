@@ -3,6 +3,7 @@ import styled from "styled-components";
 import GalleryCard from "../common/GalleryCard";
 import "./styles.css";
 
+
 const CenteredDiv = styled.div`
   display: flex;
   height: 50vw;
@@ -45,7 +46,7 @@ const Filter = styled.div`
 
 const Category = styled.div`
   position: relative;
-  z-index:1;
+  z-index:0;
   width: 1%;
   writing-mode: vertical-lr;
   transform: scale(-1);
@@ -63,27 +64,26 @@ const Category = styled.div`
 
 const Work = () => {
   const defaultWork = [
-    { title: "RDS Surrender", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "RDS Visualisers", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "RDS Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "Songs For Freedom", imageUrl: "SKATE.jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "Flight Fac Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "Pat Carrol Hope", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "RÜFÜS DU SOL Surrender", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Surrender/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "RÜFÜS DU SOL Atlas 10 Years", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Atlas/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "RÜFÜS DU SOL Coachella", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Coachella/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "Songs For Freedom", imageUrl: "SKATE.jpg", link: "/Songs-For-Freedom", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    // { title: "Flight Facility Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/FLightFacility/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "Pat Carrol - Hope", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/Hope", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
 
-    { title: "Body Place", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
-    { title: "Being Mushroom", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
-    { title: "Dawn Coordinate", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
-    { title: "Edge Of The Present", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
-    { title: "Steam Signals", imageUrl: "meetingHill.jpg", link: "/meetingHill/", linkText: "", category: "art" },
+    { title: "kajoo yannaga", imageUrl: "meetingHill.jpg", link: "/kajoo-yannaga", linkText: "", category: "art" },
+    { title: "Being Mushroom", imageUrl: "meetingHill.jpg", link: "/Being-Mushroom/", linkText: "", category: "art" },
+    { title: "Dawn Coordinate", imageUrl: "meetingHill.jpg", link: "/Dawn-Coordinate", linkText: "", category: "art" },
+    { title: "Edge Of The Present", imageUrl: "meetingHill.jpg", link: "/Edge-Of-The-Present", linkText: "", category: "art" },
+    { title: "Steam Signals", imageUrl: "meetingHill.jpg", link: "/Steam-Signals", linkText: "", category: "art" },
 
-    { title: "VAD - Thor Love & Thunder", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
-    { title: "VAD - Minecraft", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
-    { title: "FlightLight", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
-    { title: "Skate", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
-    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "virtual-production" },
+    { title: "VAD - Thor & Minecraft", imageUrl: "SKATE.jpg", link: "/VAD", linkText: "", category: "virtual-production" },
+    { title: "FlightLight", imageUrl: "SKATE.jpg", link: "/Flight-Light", linkText: "", category: "virtual-production" },
+    { title: "Skate", imageUrl: "SKATE.jpg", link: "/skate", linkText: "", category: "virtual-production" },
+    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "SKATE.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
 
-    { title: "Airforce", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "all" },
-    { title: "Syngenta", imageUrl: "SKATE.jpg", link: "/Skate/", linkText: "", category: "all" },
+    { title: "Airforce", imageUrl: "SKATE.jpg", link: "/aspc", linkText: "", category: "all" },
+    { title: "Syngenta", imageUrl: "SKATE.jpg", link: "/syngenta", linkText: "", category: "all" },
 
   ];
 
@@ -129,7 +129,7 @@ const Work = () => {
       <div className="page-full">
         <CenteredDiv>
           <iframe
-            src="https://www.youtube.com/embed/6ltKJ6FvQZY?modestbranding=1&autohide=1&showinfo=0&controls=1&rel=0&autoplay=0"
+            src="https://www.youtube.com/embed/S5OqNJ5vZrs?si=d77lW_KsdvHYJi8e?modestbranding=1&autohide=1&showinfo=0&controls=1&rel=0&autoplay=0"
             width="100%"
             height="auto"
             frameBorder="0"

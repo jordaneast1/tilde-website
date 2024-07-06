@@ -98,7 +98,6 @@ export const Contact = () => {
                     onSubmit={handleSubmit}
                   >
                     <div className='field'>
-                      <label className='label'>Your Name</label>
                       <div className='control'>
                         <input
                           className='input'
@@ -110,8 +109,8 @@ export const Contact = () => {
                         />
                       </div>
                     </div>
+                    <br></br>
                     <div className='field'>
-                      <label className='label'>Your Email</label>
                       <div className='control'>
                         <input
                           className='input'
@@ -124,7 +123,6 @@ export const Contact = () => {
                       </div>
                     </div>
                     <div className='field' style={{ display: 'none' }}>
-                      <label className='label'>Title</label>
                       <div className='styled-input wide'>
                         <input
                           type='text'
@@ -140,7 +138,6 @@ export const Contact = () => {
                       </div>
                     </div>
                     <div className='field'>
-                      <label className='label'>Message</label>
                       <div className='styled-input wide'>
                         <textarea
                           className='textarea'

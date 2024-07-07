@@ -1,6 +1,6 @@
 ---
 slug: "/skate"
-date: "2022-11-24"
+date: "..."
 title: "Skate"
 subtitle: "Subtitle"
 ---

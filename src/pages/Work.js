@@ -64,26 +64,26 @@ const Category = styled.div`
 
 const Work = () => {
   const defaultWork = [
-    { title: "RÜFÜS DU SOL Surrender", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Surrender/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "RÜFÜS DU SOL Atlas 10 Years", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Atlas/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "RÜFÜS DU SOL Coachella", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Coachella/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "Songs For Freedom", imageUrl: "SKATE.jpg", link: "/Songs-For-Freedom", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    // { title: "Flight Facility Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/FLightFacility/", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
-    { title: "Pat Carrol - Hope", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/Hope", linkText: "Line loot pinnace ahoy scurvy Jolly", category: "music" },
+    { title: "RÜFÜS DU SOL Surrender", imageUrl: "media/_Music/Rufus/Surrender Tour/RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Surrender/", linkText: "RÜFÜS DU SOL Surrender", category: "music" },
+    { title: "RÜFÜS DU SOL Atlas 10 Years", imageUrl: "media/_Music/Rufus/Surrender Tour/221202_MitchLowePhoto_RUFUSDUSOL-4-scaled.png", link: "/RDS-Atlas/", linkText: "RÜFÜS DU SOL Atlas 10 Years", category: "music" },
+    { title: "RÜFÜS DU SOL Coachella", imageUrl: "media/_Music/Rufus/Coachella/Copy of Coachella_24_JORGPHOTO_20240419_191900_4318.jpg", link: "/RDS-Coachella/", linkText: " ", category: "music" },
+    { title: "Songs For Freedom", imageUrl: "media/_Music/Songs For Freedom/GarriguYarjilba_compressed.gif", link: "/Songs-For-Freedom", linkText: "Songs for Freedom Tour", category: "music" },
+    // { title: "Flight Facility Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/FLightFacility/", linkText: " ", category: "music" },
+    { title: "Pat Carroll - Hope", imageUrl: "media/_Music/PatCarrol/Hope_Compressed.gif", link: "/Hope", linkText: "Music video for Pat Carroll - Hope", category: "music" },
 
-    { title: "kajoo yannaga", imageUrl: "meetingHill.jpg", link: "/kajoo-yannaga", linkText: "", category: "art" },
-    { title: "Being Mushroom", imageUrl: "meetingHill.jpg", link: "/Being-Mushroom/", linkText: "", category: "art" },
-    { title: "Dawn Coordinate", imageUrl: "meetingHill.jpg", link: "/Dawn-Coordinate", linkText: "", category: "art" },
-    { title: "Edge Of The Present", imageUrl: "meetingHill.jpg", link: "/Edge-Of-The-Present", linkText: "", category: "art" },
-    { title: "Steam Signals", imageUrl: "meetingHill.jpg", link: "/Steam-Signals", linkText: "", category: "art" },
+    { title: "kajoo yannaga", imageUrl: "media/_Art/BodyPlace/selected/UTP_BodyPlace by AprilPhillips_2024_credit_JacquieManning-24.jpg", link: "/kajoo-yannaga", linkText: "", category: "art" },
+    { title: "Being Mushroom", imageUrl: "media/_Art/Being Mushroom/selected/AprilPhillips_BeingMushroom_2022__credit_JacquieManning-11.jpg", link: "/Being-Mushroom/", linkText: "", category: "art" },
+    { title: "Dawn Coordinate", imageUrl: "media/_Art/Dawn Coordinate/PATYOUNIS_TDC(Z).png", link: "/Dawn-Coordinate", linkText: "", category: "art" },
+    { title: "Edge Of The Present", imageUrl: "media/_Art/EdgeOfThePresent/Copy of HighresScreenshot00023.png", link: "/Edge-Of-The-Present", linkText: "", category: "art" },
+    { title: "Steam Signals", imageUrl: "media/_Art/Steam Signals/Copy of SteamSignals_PatYounis.png", link: "/Steam-Signals", linkText: "", category: "art" },
 
     { title: "VAD - Thor & Minecraft", imageUrl: "SKATE.jpg", link: "/VAD", linkText: "", category: "virtual-production" },
-    { title: "FlightLight", imageUrl: "SKATE.jpg", link: "/Flight-Light", linkText: "", category: "virtual-production" },
-    { title: "Skate", imageUrl: "SKATE.jpg", link: "/skate", linkText: "", category: "virtual-production" },
-    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "SKATE.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
+    { title: "FlightLight", imageUrl: "media/_Virtual Production/FlightLight/Copy of HaircutSnapshot.png", link: "/Flight-Light", linkText: "", category: "virtual-production" },
+    { title: "SKATE", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/skate", linkText: "", category: "virtual-production" },
+    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
 
-    { title: "Airforce", imageUrl: "SKATE.jpg", link: "/aspc", linkText: "", category: "all" },
-    { title: "Syngenta", imageUrl: "SKATE.jpg", link: "/syngenta", linkText: "", category: "all" },
+    { title: "Airforce", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/aspc", linkText: "", category: "all" },
+    { title: "Syngenta", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/syngenta", linkText: "", category: "all" },
 
   ];
 

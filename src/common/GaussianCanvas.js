@@ -66,11 +66,11 @@ const MainCanvas = () => {
   };
 
   const transitions = {
-    sobelPosIn: 0.2,
-    sobelPosOut: 0.8,
-    greyscalePosIn: 0.1,
+    sobelPosIn: 0.05,
+    sobelPosOut: 0.9,
+    greyscalePosIn: 0.05,
     greyscalePosOut: 0.6,
-    pixelPosIn: 0.6,
+    pixelPosIn: 0.8,
     pixelPosOut: 1 
   }
 
@@ -138,14 +138,14 @@ const MainCanvas = () => {
     effectGrayScale.uniforms[ 'opacity' ].value = greyscalePos;
     effectPixel.uniforms[ "pixelSize" ].value = pixelSize;
 
-    //console.log(sobelTime)
+    // console.log(scrollPos)
 
     //turn off if at top
     viewer.update();
     //viewer.render(); 
     //composer.render();
 
-    if (( params.enable === true ) && (sobelTime > 0)){
+    if (( params.enable === true )){
 
       composer.render();
 
@@ -194,7 +194,7 @@ const MainCanvas = () => {
     const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
     const boxMesh = new THREE.Mesh(boxGeometry, new THREE.MeshBasicMaterial({'color': boxColor}));
     boxMesh.position.set(0, 5, 0);
-    scene.add(boxMesh);
+    // scene.add(boxMesh);
     
     camera.position.copy(new THREE.Vector3().fromArray([-8.25, 6.6, -22]));
     camera.up = new THREE.Vector3().fromArray([0, 1, 0]).normalize();
@@ -212,7 +212,7 @@ const MainCanvas = () => {
     'gpuAcceleratedSort': true,
     'enableSIMDInSort': true,
     'sharedMemoryForWorkers': false,
-    'integerBasedSort': true,
+    'integerBasedSort': false,
     'halfPrecisionCovariancesOnGPU': true,
     'dynamicScene': false,
     'webXRMode': GaussianSplats3D.WebXRMode.None,
@@ -275,7 +275,8 @@ const MainCanvas = () => {
       'rotation': [0, 0, 0, 0],
       'scale': [1, -1, 1],
       'position': [0, 0, 0],
-      'progressiveLoad':true
+      'progressiveLoad':true,
+      'showLoadingUI':false
     })
     .then(() => {
       //renderer.setAnimationLoop( animate );
@@ -432,7 +433,8 @@ const MainCanvas = () => {
     const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
     //scene.background = BGenv;
     viewer.renderer.autoClear = true
-    const splatPass = new RenderPass(viewer.splatMesh, camera);
+    scene.add(viewer.splatMesh)
+    const splatPass = new RenderPass(scene, camera);
     
     //const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
    // outlinePass.renderToScreen = true;

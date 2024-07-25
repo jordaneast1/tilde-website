@@ -51,10 +51,9 @@ export const About = () => {
         {/* <div  className="frame"  ></div> */}
         <h1>About us</h1>
         <p>
-          Holystone red ensign gabion warp lateen sail hearties bowsprit mizzen
-          broadside bucko. To go on account flogging parrel draught interloper
-          aft belaying pin bowsprit topsail brig. Pillage stern line quarter
-          Pieces of Eight heave down broadside gibbet killick case shot.
+        (Make more personal)
+        Tilde Visual is a creative collaboration between Jordan East and Pat Younis. 
+        Together they work on projects in the art, film, music and commercial spheres with a focus on real-time technologies
         </p>
       </FullPage1>
 
@@ -63,11 +62,11 @@ export const About = () => {
           <div className="frame" ></div>
             <h1>Pat</h1>
             <p>
-              Line loot pinnace ahoy scurvy Jolly Roger squiffy clap of thunder
-              code of conduct Shiver me timbers. Buccaneer black jack topmast
-              chase guns reef Shiver me timbers matey lugger landlubber or just
-              lubber pinnace. Measured fer yer chains ye execution dock Brethren
-              of the Coast spirits topmast chantey Jolly Roger fathom holystone.
+            (Make more personal)
+
+            Pat works between Film, Art and Music with interactive technologies like Unreal Engine to help turn creative ideas into tangible realities through the development of virtual environments.
+            Through Film as a part of the Virtual Art Department, collaborating with Artists on installations and Musicians on visuals, Pat's work in the real-time space means digitally problem solving for intuitive and elegant solutions. 
+            Pat has created a career that blends a long-time passion for video games and their technologies with a desire to support a range of industries creatively, with a goal to share that experience with others in order to contribute to an exciting, ever-growing community.
             </p>
             <ProfilePic src="/snowPat.jpg"></ProfilePic>
           </HalfPage>
@@ -78,11 +77,10 @@ export const About = () => {
             <ProfilePic src="/jordan.jpg"></ProfilePic>
             <h1>Jordan</h1>
             <p>
-              Gold Road fluke pink no prey, no pay loot Nelsons folly dead men
-              tell no tales cutlass topsail hail-shot. Line pillage deadlights
-              sheet take a caulk interloper parrel Admiral of the Black wherry
-              pressgang. Draught run a shot across the bow hulk coffer boom long
-              clothes list six pounders walk the plank Jack Tar.
+              (Make more personal)
+            Jordan's practice looks to explore our relationship with technology & with music, through immersive video and augmented physical spaces. 
+            His work spans across video, projection, interactive installations and theatre -  often collaborating with improvisational musicians, exploring the intersection of experimental electronic music and video, or interfacing performers and audiences with the work through sensors. 
+            It aims to blend the real with virtual, and often includes procedural animation, photogrammetry, real-time generative processes, or workflows that explore the ever-changing landscape of technology. 
             </p>
           </HalfPage>
       </ProfileBlock>

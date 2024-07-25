@@ -18,3 +18,6 @@ Part theatre show - part playspace immersive installation, Shipwreck Odyssey com
 
 Shipwreck Odyssey was first presented at the Australian National Maritime Museum as part of 2023 Sydney Festival. We performed over 100 shows. 
  </p>
+<div class = frame-wrapper>
+ <iframe src="https://player.vimeo.com/video/821139419?h=d76d288f26" width="640" height="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+</div>

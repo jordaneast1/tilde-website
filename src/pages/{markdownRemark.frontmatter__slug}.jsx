@@ -21,14 +21,26 @@ const Body = styled.div`
   color: white;
   max-width: 80%;
   margin-left: 10%;
+  display: flex;
+  flex-direction: column;
+
   h2 {
     color: white;
   }
   h3 {
     color: lightgrey;
   }
-  p {
+  > p {
     color: white;
+    padding-top: 10px;
+  }
+  > img {
+    width:100%;
+    margin: 200px;
+
+  }
+  a {
+    color:lightgrey;
   }
 `;
 
@@ -72,10 +84,7 @@ const ModalArtworkPage = ({ data }) => {
           <Body>
             <h2>{frontmatter.title}</h2>
             {frontmatter.subtitle && <h3>{frontmatter.subtitle}</h3>}
-            <p dangerouslySetInnerHTML={{ __html: html }} />
-            {/* <Images>
-                {imageUrls && imageUrls.map((url, i) => <img src={url} key={i} />)}
-                </Images> */}
+            <div dangerouslySetInnerHTML={{ __html: html }} />
           </Body>
         </ArtworkPage>
       )}

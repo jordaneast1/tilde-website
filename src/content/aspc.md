@@ -7,6 +7,7 @@ subtitle: "3D and VFX artists - Unity"
 <!---
 slug: must match link: URL in .Work.js
 -->
+
 <p> We were brought on by <a href='https://codeoncanvas.cc/projects/air-force-capability-visualisation'>Code on Canvas</a> and <a href='https://stopniak.com/'> Studio Stopniak</a> for the production of the Air Force Capability Visualisation project, as part of the Air & Space Power Conference 2022.
 
 
@@ -23,3 +24,11 @@ https://codeoncanvas.cc/projects/air-force-capability-visualisation/
 <div class=frame-wrapper>
 <iframe src="https://player.vimeo.com/video/716277164?h=e69b330192" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 </div>
+
+<img src='../images/media/_Other/Airforce/aspc_1.jpg'>
+<img src='../images/media/_Other/Airforce/aspc_0.jpg'>
+<img src='../images/media/_Other/Airforce/aspc_2.jpg'>
+<img src='../images/media/_Other/Airforce/aspc_3.jpg'>
+<img src='../images/media/_Other/Airforce/aspc_4.jpg'>
+<img src='../images/media/_Other/Airforce/aspc_5.jpg'>
+

@@ -9,7 +9,9 @@ const ArtworkPage = styled.section`
 `;
 
 const Head = styled.div`
-  margin: 40px 20px;
+  margin: 10px 10px;
+  position: relative;
+  font-size:25px;
 `;
 
 const Head2 = styled.div`
@@ -23,6 +25,7 @@ const Body = styled.div`
   margin-left: 10%;
   display: flex;
   flex-direction: column;
+  font-size:auto;
 
   h2 {
     color: white;

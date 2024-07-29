@@ -226,6 +226,7 @@ const MainCanvas = () => {
     'plyInMemoryCompressionLevel': 2,
     'freeIntermediateSplatData': false
 });
+scene.add(viewer.splatMesh)
 
     // postprocessing
 
@@ -433,7 +434,6 @@ const MainCanvas = () => {
     const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
     //scene.background = BGenv;
     viewer.renderer.autoClear = true
-    scene.add(viewer.splatMesh)
     const splatPass = new RenderPass(scene, camera);
     
     //const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);

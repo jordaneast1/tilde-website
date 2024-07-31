@@ -10,7 +10,7 @@ const ContactPage = styled.section`
   padding: 40px;
   text-align: center;
    
-  @media (max-width: 500px) {
+  @media (max-width: 750px) {
       width: 100%;
   }
   `  

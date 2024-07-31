@@ -113,7 +113,7 @@ return (
    {/* don't render 3D canvas on small screen */}
     <>
           { typeof window !== 'undefined' 
-            ? window.innerWidth <= 400 ?<MobileCanvas/>: <MainCanvas/> : null
+            ? window.innerWidth <= 750 ?<MobileCanvas/>: <MainCanvas/> : null
           }
     </>
 

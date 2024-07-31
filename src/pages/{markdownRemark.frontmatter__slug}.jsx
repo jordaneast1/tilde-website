@@ -7,7 +7,6 @@ import "./styles.css";
 const ArtworkPage = styled.section`
   background-color: #222; // should match .ReactModal__Content--after-open in styles.css
   margin: 20px 20px 0px 20px;
-  inset:5px;
 `;
 
 const Head = styled.div`
@@ -15,7 +14,7 @@ const Head = styled.div`
   position: relative;
   font-size:15px;
   
-  @media all and (max-width: 500px) {
+  @media all and (max-width: 750px) {
      font-size:10px;
   }
 `;
@@ -24,7 +23,7 @@ const Head2 = styled.div`
   position: relative;
   top: -25px;
 
-  @media all and (max-width: 500px) {
+  @media all and (max-width: 750px) {
       top: 0px;
       color: white;
   }

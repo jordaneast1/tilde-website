@@ -1,5 +1,6 @@
 import * as React from "react";
 import styled from 'styled-components'
+import { StaticImage } from "gatsby-plugin-image"
 
 
 
@@ -18,7 +19,11 @@ const StyledDiv = styled.div`
 const MobileCanvas = () => {
    return ( <div>
    <StyledDiv >
-    
+    <StaticImage 
+    src="images/media/_Art/MeetingHill/meetingHill.jpg" 
+    alt="A dinosaur" 
+    style = {'background-size:cover; background-position: center; background-color: #000000;'}
+    />
     </StyledDiv>
     </div>
    );

@@ -9,6 +9,10 @@ const ContactPage = styled.section`
   color: black;
   padding: 40px;
   text-align: center;
+   
+  @media (max-width: 500px) {
+      width: 100%;
+  }
   `  
 
 export const Contact = () => {

@@ -66,26 +66,29 @@ const Work = () => {
   const defaultWork = [
     { title: "kajoo yannaga", imageUrl: "media/_Art/BodyPlace/selected/UTP_BodyPlace by AprilPhillips_2024_credit_JacquieManning-24.jpg", link: "/kajoo-yannaga", linkText: "", category: "art" },
 
+    { title: "RÜFÜS DU SOL Coachella", imageUrl: "media/_Music/Rufus/Coachella/Copy of Coachella_24_JORGPHOTO_20240419_191900_4318.jpg", link: "/RDS-Coachella/", linkText: " ", category: "music" },
     { title: "RÜFÜS DU SOL Surrender", imageUrl: "media/_Music/Rufus/Surrender Tour/RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Surrender/", linkText: "RÜFÜS DU SOL Surrender", category: "music" },
     { title: "RÜFÜS DU SOL Atlas 10 Years", imageUrl: "media/_Music/Rufus/Surrender Tour/221202_MitchLowePhoto_RUFUSDUSOL-4-scaled.png", link: "/RDS-Atlas/", linkText: "RÜFÜS DU SOL Atlas 10 Years", category: "music" },
-    { title: "RÜFÜS DU SOL Coachella", imageUrl: "media/_Music/Rufus/Coachella/Copy of Coachella_24_JORGPHOTO_20240419_191900_4318.jpg", link: "/RDS-Coachella/", linkText: " ", category: "music" },
+
     // { title: "Flight Facility Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/FLightFacility/", linkText: " ", category: "music" },
+    { title: "VAD - Thor Love & Thunder", imageUrl: "media/_Virtual Production/VAD/thor_1.png", link: "/VAD-thor", linkText: "", category: "virtual-production" },
+    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
+    { title: "Air Force Capability Visualisation", imageUrl: "media/_Other/Airforce/aspc_1.jpg", link: "/aspc", linkText: "", category: "all" },
 
     { title: "Being Mushroom", imageUrl: "media/_Art/Being Mushroom/selected/AprilPhillips_BeingMushroom_2022__credit_JacquieManning-11.jpg", link: "/Being-Mushroom/", linkText: "", category: "art" },
     { title: "Dawn Coordinate", imageUrl: "media/_Art/Dawn Coordinate/PATYOUNIS_TDC(Z).png", link: "/Dawn-Coordinate", linkText: "", category: "art" },
 
-    { title: "VAD - Thor Love & Thunder", imageUrl: "media/_Virtual Production/VAD/thor_1.png", link: "/VAD-thor", linkText: "", category: "virtual-production" },
+
     { title: "FlightLight", imageUrl: "media/_Virtual Production/FlightLight/Copy of HaircutSnapshot.png", link: "/Flight-Light", linkText: "", category: "virtual-production" },
+    { title: "Songs For Freedom", imageUrl: "media/_Music/Songs For Freedom/GarriguYarjilba_compressed.gif", link: "/Songs-For-Freedom", linkText: "Songs for Freedom Tour", category: "music" },
+
     { title: "Pat Carroll - Hope", imageUrl: "media/_Music/PatCarrol/Hope_Compressed.gif", link: "/Hope", linkText: "Music video for Pat Carroll - Hope", category: "music" },
 
-    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
     { title: "Steam Signals", imageUrl: "media/_Art/Steam Signals/Copy of SteamSignals_PatYounis.png", link: "/Steam-Signals", linkText: "", category: "art" },
     { title: "Edge Of The Present", imageUrl: "media/_Art/EdgeOfThePresent/Copy of HighresScreenshot00023.png", link: "/Edge-Of-The-Present", linkText: "", category: "art" },
 
-    { title: "Songs For Freedom", imageUrl: "media/_Music/Songs For Freedom/GarriguYarjilba_compressed.gif", link: "/Songs-For-Freedom", linkText: "Songs for Freedom Tour", category: "music" },
     { title: "SKATE", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/skate", linkText: "", category: "virtual-production" },
 
-    { title: "Air Force Capability Visualisation", imageUrl: "media/_Other/Airforce/aspc_1.jpg", link: "/aspc", linkText: "", category: "all" },
 
     // { title: "Syngenta", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/syngenta", linkText: "", category: "all" },
 

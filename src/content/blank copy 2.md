@@ -1,7 +1,7 @@
 ---
-slug: "/skate"
+slug: "/template"
 date: "..."
-title: "Skate"
+title: "template"
 subtitle: "Subtitle"
 ---
 <!---

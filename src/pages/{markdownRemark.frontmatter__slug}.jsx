@@ -9,14 +9,14 @@ const ArtworkPage = styled.section`
 `;
 
 const Head = styled.div`
-  margin: 10px 10px;
+  margin: 15px 15px;
   position: relative;
-  font-size:25px;
+  font-size:15px;
 `;
 
 const Head2 = styled.div`
   position: relative;
-  top: -30px;
+  top: -25px;
 `;
 
 const Body = styled.div`

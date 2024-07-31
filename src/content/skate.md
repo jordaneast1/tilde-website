@@ -2,7 +2,7 @@
 slug: "/skate"
 date: "..."
 title: "SKATE"
-subtitle: "Big hART Production - 2019"
+subtitle: "AV Systems Design - 2019"
 ---
 <!---
 slug: must match link: URL in .Work.js

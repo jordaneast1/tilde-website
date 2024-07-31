@@ -4,6 +4,7 @@ body {
   background-color: rgb(240, 240, 240);
   font-size: 14px;
   scroll-behavior: smooth;
+  margin: 0;
 }
 
 .loading-screen {
@@ -164,15 +165,27 @@ body {
   justify-content: center;
 }
 
-
 .ReactModal__Content--after-open {
-  inset: 80px;
   background: #222 !important;
+
+  @media (max-width: 500px) {
+    inset: 5px !important;
+    padding: 0px !important;
+  }
 
 }
 
+.ReactModal__Body--open{
+  @media (max-width: 500px) {
+    inset: 5px;
+  }
+}
+
+
 #___gatsby {
   height: 100%;
+  margin: 0;
+
 }
 #___gatsby > * {
   height: 100%;

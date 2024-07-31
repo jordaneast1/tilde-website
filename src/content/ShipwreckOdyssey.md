@@ -2,7 +2,7 @@
 slug: "/ShipwreckOdyssey"
 date: "..."
 title: "Box of Birds - Shipwreck Odyssey"
-subtitle: "Subtitle"
+subtitle: "Interaction Design"
 ---
 <!---
 slug: must match link: URL in .Work.js

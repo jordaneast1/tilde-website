@@ -2,21 +2,33 @@ import React from "react";
 import styled from "styled-components";
 import { Link, graphql } from "gatsby";
 import { ModalRoutingContext } from "gatsby-plugin-modal-routing-v5.0";
+import "./styles.css";
 
 const ArtworkPage = styled.section`
   background-color: #222; // should match .ReactModal__Content--after-open in styles.css
   margin: 20px 20px 0px 20px;
+  inset:5px;
 `;
 
 const Head = styled.div`
   margin: 15px 15px;
   position: relative;
   font-size:15px;
+  
+  @media all and (max-width: 500px) {
+     font-size:10px;
+  }
 `;
 
 const Head2 = styled.div`
   position: relative;
   top: -25px;
+
+  @media all and (max-width: 500px) {
+      top: 0px;
+      color: white;
+  }
+
 `;
 
 const Body = styled.div`
@@ -40,10 +52,18 @@ const Body = styled.div`
   > img {
     width:100%;
     margin: 200px;
-
   }
   a {
     color:lightgrey;
+  }
+  
+  @media all and (max-width: 500px) {
+    max-width: 100%;
+    margin-left: 5%;
+
+    > img {
+      margin: 50px;
+    }  
   }
 `;
 
@@ -54,6 +74,7 @@ const StyledLink = styled(Link)`
   &:hover {
     color: white;
   }
+
 `;
 
 const ModalArtworkPage = ({ data }) => {

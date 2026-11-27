@@ -117,7 +117,7 @@ const GalleryCard = ({ title, linkText, imageUrl, link, category, indexProp, isF
   
   const data = useStaticQuery(graphql`
     query {
-      allFile(filter: { extension: { regex: "/(jpg|jpeg|png|gif)/" }, sourceInstanceName: { eq: "images" } }) {
+      allFile(filter: { extension: { regex: "/(jpg|jpeg|png|gif|webp)/" }, sourceInstanceName: { eq: "images" } }) {
         nodes {
           relativePath
           publicURL

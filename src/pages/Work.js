@@ -64,7 +64,9 @@ const Category = styled.div`
 
 const Work = () => {
   const defaultWork = [
-    { title: "kajoo yannaga", imageUrl: "media/_Art/BodyPlace/selected/UTP_BodyPlace by AprilPhillips_2024_credit_JacquieManning-24.jpg", link: "/kajoo-yannaga", linkText: "", category: "art" },
+    { title: "Under Waters", imageUrl: "media/_Art/Under Waters/S1_2026_Under Waters_Exhibtion Documentation_Guy Louden_Web-5.jpg", link: "/under-waters", linkText: "", category: "art" },
+    { title: "Terracotta Warriors", imageUrl: "media/_Art/Terracotta Warriors/terracotta-warriors-hres.gif", link: "/terracotta-warriors", linkText: "", category: "art" },
+    { title: "kajoo yannaga", imageUrl: "media/_Art/kajoo yannaga/kajoo+yannaga_image+edit_+AprilPhillips_2024_credit_JacquieManning-24_V2.webp", link: "/kajoo-yannaga", linkText: "", category: "art" },
 
     { title: "RÜFÜS DU SOL Coachella", imageUrl: "media/_Music/Rufus/Coachella/Copy of Coachella_24_JORGPHOTO_20240419_191900_4318.jpg", link: "/RDS-Coachella/", linkText: " ", category: "music" },
     { title: "RÜFÜS DU SOL Surrender", imageUrl: "media/_Music/Rufus/Surrender Tour/RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Surrender/", linkText: "RÜFÜS DU SOL Surrender", category: "music" },
@@ -74,6 +76,7 @@ const Work = () => {
     { title: "VAD - Thor Love & Thunder", imageUrl: "media/_Virtual Production/VAD/thor_1.png", link: "/VAD-thor", linkText: "", category: "virtual-production" },
     { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
     { title: "Air Force Capability Visualisation", imageUrl: "media/_Other/Airforce/aspc_1.jpg", link: "/aspc", linkText: "", category: "all" },
+    { title: "Syngenta", imageUrl: "media/_Other/Syngenta/Cylinder_pano_02_26880x4320px.jpg", link: "/syngenta", linkText: "", category: "all" },
 
     { title: "Being Mushroom", imageUrl: "media/_Art/Being Mushroom/selected/AprilPhillips_BeingMushroom_2022__credit_JacquieManning-11.jpg", link: "/Being-Mushroom/", linkText: "", category: "art" },
     { title: "Dawn Coordinate", imageUrl: "media/_Art/Dawn Coordinate/PATYOUNIS_TDC(Z).png", link: "/Dawn-Coordinate", linkText: "", category: "art" },
@@ -89,8 +92,6 @@ const Work = () => {
 
     { title: "SKATE", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/skate", linkText: "", category: "virtual-production" },
 
-
-    // { title: "Syngenta", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/syngenta", linkText: "", category: "all" },
 
   ];
 

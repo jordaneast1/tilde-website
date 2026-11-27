@@ -9,7 +9,7 @@ slug: must match link: URL in .Work.js
 -->
 <img src='../images/media/_Other/Syngenta/Cylinder_pano_02_26880x4320px.jpg' alt='Syngenta VR wheat field panorama'>
 
-<p>As virtual technologies improve, it is becoming possible to explore increasingly realistic environments. In this project sponsored by agricultural company Syngenta Australia, the 3DVAL created a digital educational experience that replicates on-site learnings gathered at Syngenta’s physical learning centres across the country.</p>
+<p> In this project sponsored by agricultural company Syngenta Australia, we worked along side UNSW's 3DVAL to create a digital educational experience that replicates on-site learnings gathered at Syngenta’s physical learning centres across the country.</p>
 
 <p>In this immersive VR experience, users can explore wheat fields and learn about the impact of Crown Rot – a fungal disease that can be devastating to the global wheat industry. Users learn about the disease cycle, mechanisms leading to poor crop yields, and how Syngenta products can treat the disease to reduce the impact of Crown Rot.</p>
 

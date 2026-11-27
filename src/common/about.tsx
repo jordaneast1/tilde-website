@@ -2,156 +2,181 @@ import * as React from "react";
 import styled from "styled-components";
 import { StaticImage } from "gatsby-plugin-image";
 
-const FullPage1 = styled.section`
+// Width of one portrait. The whole About section is sized from this, so it is
+// exactly as wide as the two portraits side by side plus the thin border.
+const PORTRAIT_WIDTH = "clamp(15rem, 30vw, 26rem)";
+const BORDER = "8px";
+
+// Bio items shown (one per line, under the name) when hovering a portrait.
+const PAT_BIO = [
+  "3D",
+  "environment design",
+  "animation",
+  "niche video game knowledge",
+];
+
+const JORDAN_BIO = [
+  "programming",
+  "exhibition design",
+  "particles",
+  "niche electronic music knowledge",
+];
+
+// Shrinks to fit the portraits and centres itself.
+const AboutWrap = styled.div`
+  display: grid;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 2% 0;
+`;
+
+// The intro box takes the wrapper's width without widening it
+// (width: 0 + min-width: 100% stops its text from setting the width).
+const Intro = styled.section`
+  width: 0;
+  min-width: 100%;
+  box-sizing: border-box;
+  padding: 1.5rem 1.5rem 1rem;
   background-color: white;
   color: black;
 `;
-const HalfPage = styled.section`
-  padding: 4%;
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  width: 42%;
-  position: relative;
-  overflow: hidden;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding-box;
-  background-clip: padding-box;
-  /* keeps the inverted text blending against this card only */
-  isolation: isolate;
-  min-height: 36rem;
-  /* text sits at the bottom of the frame */
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
 
-  /* Darken the bottom of the photo under the text so the inverted text keeps
-     its contrast where it crosses mid-grey parts of the photo (most of the
-     card on narrow screens). Sits above the photo (z 0, later in order) and
-     below the text (z 1). */
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 8px;
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.75) 0%,
-      rgba(0, 0, 0, 0.45) 40%,
-      rgba(0, 0, 0, 0) 70%
-    );
-
-    /* narrow cards: the text column runs most of the card's height */
-    @media all and (max-width: 900px) {
-      background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.75) 0%,
-        rgba(0, 0, 0, 0.55) 60%,
-        rgba(0, 0, 0, 0.35) 100%
-      );
-    }
-  }
-
-  @media all and (max-width: 800px) {
-    /* On small screens, we are no longer using row direction but column */
-    width: 92%
-  }
-`;
-
-// Text sits above the headshot and inverts whatever is behind it, so it
-// reads as dark over the light parts of the photo and white over the dark.
-const ProfileText = styled.div`
-  position: relative;
-  z-index: 1;
-  color: white;
-  mix-blend-mode: difference;
-`;
-
-
+// The thin dark band around and between the two portraits.
 const ProfileBlock = styled.section`
-width:100%;
-display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: stretch;
-  @media all and (max-width: 800px) {
-    /* On small screens, we are no longer using row direction but column */
+  display: flex;
+  gap: ${BORDER};
+  padding: ${BORDER};
+  background-color: rgba(0, 0, 0, 0.5);
+
+  @media all and (max-width: 640px) {
+    /* side by side would be too small for the bios on phones */
     flex-direction: column;
   }
 `;
 
-// Applied to the StaticImage wrappers below (StaticImage props must be
-// static, so it can't be wrapped with styled()). The headshot sits behind
-// the text on the right side of the card, filling its full height at its
-// natural 2:3 ratio.
-// Inset by 8px = the .frame border's 5px offset + 3px width, so the photo
-// sits exactly inside the white frame.
-const profilePicStyle: React.CSSProperties = {
+// Shared by the name and the bio items so they are exactly the same size.
+// Scales with the portrait's width (cqi = 1% of the portrait's width).
+const TEXT_SIZE = "7cqi";
+const PAD = "1.25rem";
+
+// Dark overlay holding the bio list; hidden until hover / tap / focus.
+// Top padding leaves room for the name, which stays visible at the top.
+const Bio = styled.ul`
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: calc(${PAD} + 1.3em + 0.6em) ${PAD} ${PAD};
+  list-style: none;
+  background-color: rgba(0, 0, 0, 0.72);
+  color: white;
+  font-size: ${TEXT_SIZE};
+  line-height: 1.3;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  /* each item on its own line; a long item that wraps is still one item */
+  li {
+    margin: 0 0 0.35em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+`;
+
+const Name = styled.h2`
+  position: absolute;
+  top: ${PAD};
+  left: ${PAD};
+  right: ${PAD};
+  z-index: 2;
+  margin: 0;
+  color: white;
+  font-size: ${TEXT_SIZE};
+  line-height: 1.3;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+`;
+
+// One portrait: the photo with the name on it; the bio fades in on hover,
+// or on tap / keyboard focus (touch screens have no hover).
+const Portrait = styled.div`
+  position: relative;
+  /* lets the text size above scale with this portrait's width */
+  container-type: inline-size;
+  width: ${PORTRAIT_WIDTH};
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  cursor: default;
+  outline: none;
+
+  &:hover ${Bio},
+  &:focus ${Bio},
+  &:focus-within ${Bio} {
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px white;
+  }
+
+  @media all and (max-width: 640px) {
+    width: min(26rem, calc(100vw - 2.5rem));
+  }
+`;
+
+// Applied to the StaticImage wrappers (StaticImage props must be static, so
+// it can't be wrapped with styled()). Fills the portrait.
+const photoStyle: React.CSSProperties = {
   position: "absolute",
-  top: 8,
-  bottom: 8,
-  right: 8,
-  height: "calc(100% - 16px)",
-  width: "auto",
-  aspectRatio: "2 / 3",
-  zIndex: 0,
+  inset: 0,
+  width: "100%",
+  height: "100%",
   filter: "grayscale(100%)",
 };
 
 export const About = () => {
   return (
-    <div id="about-header" className="page" >
-      <div className="page-full">
-      <FullPage1 className="page-full" data-aos="fade-down">
-        {/* <div  className="frame"  ></div> */}
-        <h1>About us</h1>
-        <p>
-        Tilde Visual is a creative collaboration between Jordan East and Pat Younis. 
-        Together they work on projects in the art, film, music and commercial spheres with a focus on real-time technologies
-        </p>
-      </FullPage1>
+    <div id="about-header" className="page">
+      <AboutWrap>
+        <Intro data-aos="fade-down">
+          <h1>About us</h1>
+          <p>
+          Tilde Visual is the creative partnerhip of Jordan East and Pat Younis. Our collaboration started with our shared interest in interactive technologies, music and games but grew when we realsied our complementary skillsets covered all bases when building the projects we wanted to make. To be reductive...
+          </p>
+        </Intro>
 
-      <ProfileBlock>
-          <HalfPage>
+        <ProfileBlock>
+          <Portrait tabIndex={0}>
             <StaticImage
               src="../images/headshots/Pat_2026_credit_JacquieManning-36.jpg"
               alt="Pat Younis. Photo: Jacquie Manning"
               width={640}
-              style={profilePicStyle}
+              style={photoStyle}
+              imgStyle={{ objectFit: "cover" }}
             />
-            <div className="frame" style={{ zIndex: 2 }}></div>
-            <ProfileText>
-              <h1>Pat</h1>
-              <p>
-              Pat works between Film, Art and Music with interactive technologies like Unreal Engine to help turn creative ideas into tangible realities through the development of virtual environments.
-              Through Film as a part of the Virtual Art Department, collaborating with Artists on installations and Musicians on visuals, Pat's work in the real-time space means digitally problem solving for intuitive and elegant solutions.
-              Pat has created a career that blends a long-time passion for video games and their technologies with a desire to support a range of industries creatively, with a goal to share that experience with others in order to contribute to an exciting, ever-growing community.
-              </p>
-            </ProfileText>
-          </HalfPage>
+            <Name>Pat does the...</Name>
+            <Bio>
+              {PAT_BIO.map((item) => <li key={item}>{item}</li>)}
+            </Bio>
+          </Portrait>
 
-
-          <HalfPage>
+          <Portrait tabIndex={0}>
             <StaticImage
               src="../images/headshots/Jordan_2026_credit_JacquieManning-32.jpg"
               alt="Jordan East. Photo: Jacquie Manning"
               width={640}
-              style={profilePicStyle}
+              style={photoStyle}
+              imgStyle={{ objectFit: "cover" }}
             />
-            <div className="frame" style={{ zIndex: 2 }}></div>
-            <ProfileText>
-              <h1>Jordan</h1>
-              <p>
-              Jordan's practice looks to explore our relationship with technology & music, through immersive video and augmented physical spaces.
-              His work spans across video, projection, interactive installations and theatre -  often collaborating with improvisational musicians or interfacing performers and audiences through realtime technologies.
-              It aims to blend the real with virtual, and often includes procedural animation, photogrammetry, real-time generative processes, or workflows that explore the ever-changing landscape of technology.
-              </p>
-            </ProfileText>
-          </HalfPage>
-      </ProfileBlock>
-      </div>
+            <Name>Jordan does the...</Name>
+            <Bio>
+              {JORDAN_BIO.map((item) => <li key={item}>{item}</li>)}
+            </Bio>
+          </Portrait>
+        </ProfileBlock>
+      </AboutWrap>
     </div>
   );
 };

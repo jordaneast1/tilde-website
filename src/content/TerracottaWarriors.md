@@ -21,19 +21,20 @@ slug: must match link: URL in .Work.js
 
 <p><a href='https://juniormajor.com/warrior-tomb'>https://juniormajor.com/warrior-tomb</a></p>
 
-<h3>Technology</h3>
+<p><b>From Tilde Visual:</b></p>
 
-<p>Built in Unreal Engine using nDisplay, the real-time installation spans 13 wall and floor projections mapped using Nvidia Mosaic and Epson projection utilities. Depth cameras track each visitor, with point clouds composited in Pointcaster and streamed into Unreal via ZeroMQ.</p>
+<p>Our role on this project was to develop the Unreal Engine environments, visual effect and interaction design, and to manage the distributed nDisplay rendering system.  This project was a launchpad for developing the native Unreal Engine plugin for Pointcaster which we developed working with Matthew Hughes, which fascilitated interaction in nDisplay and Live Link environments. This project was an amazing test-case for scalable interactive projects using Unreal Engine and Pointcaster. It was an amazing experience and really great to be working alongside such great teams at Junior Major and WAM.</p>
 
-<p>Dynamic lighting, driven by Enttec Pixel Dots, responds to movement via Pointcaster and TouchDesigner and is mapped to the physical space using Enttec ELM. 10 channels of spatial audio are played back via QLab and synchronised with the visuals via OSC.</p>
 
 <img src='../images/media/_Art/Terracotta Warriors/jm_17_03_warrior_tomb_01_dsf6536-4k_edit-2000x-q90.webp' alt='Terracotta Warriors - The Emperor’s Tomb. Photo: Aristo Risi'>
 <img src='../images/media/_Art/Terracotta Warriors/jm_17_03_warrior_tomb_07_dsf6623-4k_edit-2000x-q90.webp' alt='Terracotta Warriors - The Emperor’s Tomb. Photo: Aristo Risi'>
 <img src='../images/media/_Art/Terracotta Warriors/jm_17_03_warrior_tomb_15_dsf6860-4k_edit-2000x-q90.webp' alt='Terracotta Warriors - The Emperor’s Tomb. Photo: Aristo Risi'>
 
-<p><b>From me:</b></p>
+<h3>Technology</h3>
 
-<p>This project was an amazing test-case for scalable interactive projects using Unreal Engine and Pointcaster. My role as Unreal Artist / Developer was to manage the distributed nDisplay rendering system, working alongside Matt to begin the creation of the native unreal Engine Pointcaster plug-in, creating the interactive particle systems and animation systems, and alongside Pat, creating many of the design elements and all the other Unreal systems needed to make a project like this come to life. It was an amazing experience and really great to be working alongside such great teams at Junior Major and WAM.</p>
+<p>Built in Unreal Engine using nDisplay, the real-time installation spans 13 wall and floor projections mapped using Nvidia Mosaic and Epson projection utilities. Depth cameras track each visitor, with point clouds composited in Pointcaster and streamed into Unreal via ZeroMQ.</p>
+
+<p>Dynamic lighting, driven by Enttec Pixel Dots, responds to movement via Pointcaster and TouchDesigner and is mapped to the physical space using Enttec ELM. 10 channels of spatial audio are played back via QLab and synchronised with the visuals via OSC.</p>
 
 <h3>Credits</h3>
 <ul>

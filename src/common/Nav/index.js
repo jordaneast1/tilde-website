@@ -36,7 +36,8 @@ const NavListLink = styled(Link)`
     
     /* Small screens */
   @media all and (max-width: 500px) {
-    padding: 3px;
+    /* taller vertical padding gives a ~40px tap target within the 50px bar */
+    padding: 14px 4px;
     font-size: 12px;
   }
 `;

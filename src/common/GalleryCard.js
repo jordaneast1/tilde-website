@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Link } from "gatsby";
 import PropTypes from "prop-types";
 import "../pages/styles.css";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GatsbyImage, getImage } from 'gatsby-plugin-image';
 import { graphql, useStaticQuery } from 'gatsby';
 import slugify from 'react-slugify';
@@ -59,7 +59,14 @@ const GalleryItemLink = styled(Link)`
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    /* without a width the title shrinks to half the tile and wraps early */
+    width: 90%;
+    font-size: clamp(15px, 2vw, 28px);
     opacity: 1;
+
+    @media all and (max-width: 500px) {
+      font-size: 20px;
+    }
     transition: 0.3s;
     color: black;
     z-index: 1;
@@ -72,10 +79,13 @@ const PublicURLImage = styled.img`
   height: 100%;
 `;
 
-const GalleryImageBroken = styled.div`
+// Stand-in for a missing or failed image: a black 16:9 frame, so the card
+// keeps a proper height and the grid stays intact.
+const GalleryImageFallback = styled.div`
+  display: block;
   width: 100%;
-  height: 100%;
-  background-color:white;
+  aspect-ratio: 16 / 9;
+  background-color: black;
 `;
 
 const useWidthPercentage = (indexProp, category, isFiltered) => {
@@ -131,27 +141,62 @@ const GalleryCard = ({ title, linkText, imageUrl, link, category, indexProp, isF
 
   const imageNode = data.allFile.nodes.find(node => node.relativePath === imageUrl);
 
-  let content;
-  if (!imageNode) {
-    content = <GalleryImageBroken>Image not found</GalleryImageBroken>;
-  } else if (imageNode.childImageSharp) {
-    const image = getImage(imageNode.childImageSharp.gatsbyImageData);
-    content = <GatsbyImage image={image} alt={linkText} 
-      style={{ 
-        width: '100%', 
-        height: '100%',  
-        objectFit: 'cover'  
-      }} />;
-  } else if (imageNode.publicURL) {
-    content = <PublicURLImage src={imageNode.publicURL} alt={imageUrl} />;
-  } else {
-    content = <GalleryImageBroken>Image not processed correctly</GalleryImageBroken>;
+  // Set if the image fails to load in the browser (e.g. network error).
+  const [loadFailed, setLoadFailed] = useState(false);
+  const onImageError = () => setLoadFailed(true);
+
+  // The image is in the server-rendered HTML, so it can fail before React
+  // hydrates and attaches onError, and gatsby-plugin-image swaps in new <img>
+  // elements as it hydrates. So: check whether the image already finished
+  // broken, and catch later failures with a capture-phase listener on the
+  // wrapper (image error events don't bubble, but capture still sees them).
+  const contentRef = useRef(null);
+  useEffect(() => {
+    const wrapper = contentRef.current;
+    if (!wrapper) return;
+    const mainImg = wrapper.querySelector('img[data-main-image]') ||
+      wrapper.querySelector('img:not([data-placeholder-image])');
+    if (mainImg && mainImg.complete && mainImg.naturalWidth === 0 && mainImg.currentSrc) {
+      setLoadFailed(true);
+      return;
+    }
+    const onCapturedError = (event) => {
+      const el = event.target;
+      // ignore the tiny inline placeholder; only the real image matters
+      if (el.tagName === 'IMG' && !el.hasAttribute('data-placeholder-image')) setLoadFailed(true);
+    };
+    wrapper.addEventListener('error', onCapturedError, true);
+    return () => wrapper.removeEventListener('error', onCapturedError, true);
+  }, []);
+
+  let content = null;
+  if (imageNode && !loadFailed) {
+    if (imageNode.childImageSharp) {
+      const image = getImage(imageNode.childImageSharp.gatsbyImageData);
+      content = <GatsbyImage image={image} alt={linkText} onError={onImageError}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover'
+        }} />;
+    } else if (imageNode.publicURL) {
+      content = <PublicURLImage src={imageNode.publicURL} alt={imageUrl} onError={onImageError} />;
+    }
+  }
+
+  const isFallback = content === null;
+  if (isFallback) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`GalleryCard: image for "${title}" ${loadFailed ? 'failed to load' : 'not found'}: ${imageUrl}`);
+    }
+    content = <GalleryImageFallback aria-hidden="true" />;
   }
 
   return (
     <GalleryItemLink to={slugLink} state={{ modal: true }} style={{ width: widthPercentage }}>
-      <h1 className="hchild">{title}</h1>
-      {content}
+      {/* titles are black until hover; keep them readable on the black fallback */}
+      <h1 className="hchild" style={isFallback ? { color: 'white' } : undefined}>{title}</h1>
+      <div ref={contentRef} style={{ display: 'contents' }}>{content}</div>
     </GalleryItemLink>
   );
 };

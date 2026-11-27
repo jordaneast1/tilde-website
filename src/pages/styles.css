@@ -421,6 +421,11 @@ input[name="honeypot"] {
 
   transition: 0.5s;
 
+  /* match the tab labels (.tab > .tab-box) on small screens */
+  @media all and (max-width: 900px) {
+    padding: 3px;
+    font-size: 12px;
+  }
 }
 
 .tab > .tab-input {

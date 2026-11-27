@@ -62,6 +62,14 @@ const Category = styled.div`
   }
 `;
 
+// Display names for the category values used in the work list below.
+// "art" is kept as the internal value; it's shown as "immersive arts".
+const CATEGORY_LABELS = {
+  "art": "immersive arts",
+  "virtual-production": "virtual production",
+  "music": "music",
+};
+
 const Work = () => {
   const defaultWork = [
     { title: "Under Waters", imageUrl: "media/_Art/Under Waters/S1_2026_Under Waters_Exhibtion Documentation_Guy Louden_Web-5.jpg", link: "/under-waters", linkText: "", category: "art" },
@@ -74,9 +82,9 @@ const Work = () => {
 
     // { title: "Flight Facility Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/FLightFacility/", linkText: " ", category: "music" },
     { title: "VAD - Thor Love & Thunder", imageUrl: "media/_Virtual Production/VAD/thor_1.png", link: "/VAD-thor", linkText: "", category: "virtual-production" },
-    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "virtual-production" },
-    { title: "Air Force Capability Visualisation", imageUrl: "media/_Other/Airforce/aspc_1.jpg", link: "/aspc", linkText: "", category: "all" },
-    { title: "Syngenta", imageUrl: "media/_Other/Syngenta/Cylinder_pano_02_26880x4320px.jpg", link: "/syngenta", linkText: "", category: "all" },
+    { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "art" },
+    { title: "Air Force Capability Visualisation", imageUrl: "media/_Other/Airforce/aspc_1.jpg", link: "/aspc", linkText: "", category: "art" },
+    { title: "Syngenta", imageUrl: "media/_Other/Syngenta/Cylinder_pano_02_26880x4320px.jpg", link: "/syngenta", linkText: "", category: "art" },
 
     { title: "Being Mushroom", imageUrl: "media/_Art/Being Mushroom/selected/AprilPhillips_BeingMushroom_2022__credit_JacquieManning-11.jpg", link: "/Being-Mushroom/", linkText: "", category: "art" },
     { title: "Dawn Coordinate", imageUrl: "media/_Art/Dawn Coordinate/PATYOUNIS_TDC(Z).png", link: "/Dawn-Coordinate", linkText: "", category: "art" },
@@ -90,7 +98,7 @@ const Work = () => {
     { title: "Steam Signals", imageUrl: "media/_Art/Steam Signals/Copy of SteamSignals_PatYounis.png", link: "/Steam-Signals", linkText: "", category: "art" },
     { title: "Edge Of The Present", imageUrl: "media/_Art/EdgeOfThePresent/Copy of HighresScreenshot00023.png", link: "/Edge-Of-The-Present", linkText: "", category: "art" },
 
-    { title: "SKATE", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/skate", linkText: "", category: "virtual-production" },
+    { title: "SKATE", imageUrl: "media/_Virtual Production/SKATE/SKATE.jpg", link: "/skate", linkText: "", category: "art" },
 
 
   ];
@@ -156,30 +164,27 @@ const Work = () => {
         <Gallery>
           <Filter>
             <div className="tabs">
-              <label className="tab-header">
-                <div className="tab-box"><b>WE CREATE FOR</b></div>
+              <label className="tab">
+                <input type="radio" name="category-list" value="all" className="tab-input" onChange={handleCategoryChange} checked={selectedCategory === "all"} />
+                <div className="tab-box">ALL</div>
               </label>
               <label className="tab">
-                <input type="radio" name="category-list" value="virtual-production" className="tab-input" onChange={handleCategoryChange} />
-                <div className="tab-box">VIRTUAL PRODUCTION</div>
+                <input type="radio" name="category-list" value="art" className="tab-input" onChange={handleCategoryChange} checked={selectedCategory === "art"} />
+                <div className="tab-box">{CATEGORY_LABELS["art"].toUpperCase()}</div>
               </label>
               <label className="tab">
-                <input type="radio" name="category-list" value="music" className="tab-input" onChange={handleCategoryChange} />
-                <div className="tab-box">MUSIC</div>
+                <input type="radio" name="category-list" value="virtual-production" className="tab-input" onChange={handleCategoryChange} checked={selectedCategory === "virtual-production"} />
+                <div className="tab-box">{CATEGORY_LABELS["virtual-production"].toUpperCase()}</div>
               </label>
               <label className="tab">
-                <input type="radio" name="category-list" value="art" className="tab-input" onChange={handleCategoryChange} />
-                <div className="tab-box">ART</div>
-              </label>
-              <label className="tab">
-                <input type="radio" name="category-list" value="all" className="tab-input" onChange={handleCategoryChange} />
-                <div className="tab-box">... IN REAL-TIME</div>
+                <input type="radio" name="category-list" value="music" className="tab-input" onChange={handleCategoryChange} checked={selectedCategory === "music"} />
+                <div className="tab-box">{CATEGORY_LABELS["music"].toUpperCase()}</div>
               </label>
             </div>
           </Filter>
 
           <Category style={{ display: (selectedCategory === "all" || !selectedCategory) ? 'none' : 'block' }}>
-            {selectedCategory}
+            {CATEGORY_LABELS[selectedCategory]}
           </Category>
 
           {filteredLists.all.map((element, index) => (
@@ -188,8 +193,17 @@ const Work = () => {
 
 
 
+          {/* remaining categories, in the same order as the filter buttons */}
+          <Category style={{ display: selectedCategory === "art" || selectedCategory === "all" || !selectedCategory? 'none' : 'block' }}>
+            {CATEGORY_LABELS["art"]}
+          </Category>
+
+          {filteredLists["art"].map((element, index) => (
+            <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
+          ))}
+
           <Category style={{ display: selectedCategory === "virtual-production" || selectedCategory === "all" || !selectedCategory ? 'none' : 'block' }}>
-            virtual production
+            {CATEGORY_LABELS["virtual-production"]}
           </Category>
 
           {filteredLists["virtual-production"].map((element, index) => (
@@ -197,20 +211,12 @@ const Work = () => {
           ))}
 
           <Category style={{ display: selectedCategory === "music" || selectedCategory === "all" || !selectedCategory ? 'none' : 'block' }}>
-            music
+            {CATEGORY_LABELS["music"]}
           </Category>
 
           {filteredLists["music"].map((element, index) => (
             <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
           ))}
-
-          <Category style={{ display: selectedCategory === "art" || selectedCategory === "all" || !selectedCategory? 'none' : 'block' }}>
-            art
-          </Category>
-
-          {filteredLists["art"].map((element, index) => (
-            <GalleryCard {...element} key={`${index}-${rerenderKey}`} indexProp = {index} isFiltered={isFiltered} />
-          ))}  
           
 
 

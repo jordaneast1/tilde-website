@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Helmet } from "react-helmet";
 import { Link } from "gatsby";
@@ -100,6 +100,18 @@ const home = () => {
     }
   });
 
+  // Pick the background after mount: deciding during render made the
+  // server HTML and first client render differ (React hydration errors).
+  // Small screens, and phones in landscape, get the lightweight image
+  // instead of downloading the full 3D splat scene.
+  const [canvasMode, setCanvasMode] = useState<"mobile" | "desktop" | null>(null);
+  useEffect(() => {
+    const isPhoneLandscape =
+      window.matchMedia("(pointer: coarse)").matches &&
+      Math.min(window.innerWidth, window.innerHeight) <= 500;
+    setCanvasMode(window.innerWidth <= 750 || isPhoneLandscape ? "mobile" : "desktop");
+  }, []);
+
 
 
 return (
@@ -116,11 +128,8 @@ return (
     </Helmet>
 
    {/* don't render 3D canvas on small screen */}
-    <>
-          { typeof window !== 'undefined' 
-            ? window.innerWidth <= 750 ?<MobileCanvas/>: <MainCanvas/> : null
-          }
-    </>
+    {canvasMode === "mobile" && <MobileCanvas />}
+    {canvasMode === "desktop" && <MainCanvas />}
 
     <Blank><HeroTitle /><ArrowDown to="/#work-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
     <Work />

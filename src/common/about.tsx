@@ -25,6 +25,34 @@ const HalfPage = styled.section`
   flex-direction: column;
   justify-content: flex-end;
 
+  /* Darken the bottom of the photo under the text so the inverted text keeps
+     its contrast where it crosses mid-grey parts of the photo (most of the
+     card on narrow screens). Sits above the photo (z 0, later in order) and
+     below the text (z 1). */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.45) 40%,
+      rgba(0, 0, 0, 0) 70%
+    );
+
+    /* narrow cards: the text column runs most of the card's height */
+    @media all and (max-width: 900px) {
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.75) 0%,
+        rgba(0, 0, 0, 0.55) 60%,
+        rgba(0, 0, 0, 0.35) 100%
+      );
+    }
+  }
+
   @media all and (max-width: 800px) {
     /* On small screens, we are no longer using row direction but column */
     width: 92%

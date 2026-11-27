@@ -2,59 +2,60 @@ import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import styled from 'styled-components'
 
-import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
-
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import {OutlinePass} from 'three/examples/jsm/postprocessing/OutlinePass.js'
 import { LuminosityShaderWithOpacity } from './Shaders/LuminosityShaderWithOpacity';
 import { SobelWithOpacity } from '../common/Shaders/SobelWithOpacity';
-// import { PixelShader } from 'three/examples/jsm/shaders/PixelShader.js';
 import { PixelShader } from './Shaders/PixelShader.js';
-import {EXRLoader } from "three/examples/jsm/loaders/EXRLoader.js";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
+// Splat scene, served from /static
+const SPLAT_URL = '/mttilde_Cleanup.ply'
 
+// Transform for the splat. The rotation quaternion is deliberately NOT
+// normalised: the previous renderer composed its matrix from these exact
+// values, so composing them the same way keeps the framing identical.
+// The y position compensates for mttilde_Cleanup.ply being exported
+// ~4.55 units higher (in file space) than the old .splat.
+const SPLAT_POSITION = new THREE.Vector3(0, 5.9, 0)
+const SPLAT_ROTATION = new THREE.Quaternion(0, -0.6, 0, 0.707)
+const SPLAT_SCALE = new THREE.Vector3(1.3, -1.3, 1.3)
+
+// Seconds for the splat to fade in once loaded
+const SPLAT_FADE_IN = 2.5
 
 const StyledDiv = styled.div`
   overflow: hidden;
   position: fixed;
   width: 100%;
   height: 100%;
-  
+
 `
 
 const MainCanvas = () => {
-  
+
 
   const threeElement = useRef();
   let loadingscreen = useRef()
   let texLoader = useRef();
-  let loader = useRef()
-  let exrLoader = useRef();
 
-  let viewer = useRef();
+  let splat = useRef();
+  let splatRenderer = useRef();
   let renderer = useRef();
   let camera = useRef();
   let scene = useRef();
-  let mouse = useRef()
-  let target = useRef()
-
-  let shape = useRef()
 
   let fogCol = useRef();
   let composer = useRef()
   let effectSobel = useRef()
   let effectGrayScale = useRef()
-  let effect1 = useRef()
   let effectPixel = useRef();
-  let skyBoxTex = useRef();
   let skyBoxBGTex = useRef();
   let pmremGenerator = useRef();
 
   let controls = useRef()
-  
+
 
   const params = {
     enable: true,
@@ -71,12 +72,12 @@ const MainCanvas = () => {
     greyscalePosIn: 0.05,
     greyscalePosOut: 0.6,
     pixelPosIn: 0.8,
-    pixelPosOut: 1 
+    pixelPosOut: 1
   }
 
   let controlsOn = true;
 
-  
+
   let targetScrollPos = 0;
   let scrollPos = 0;
 
@@ -85,7 +86,7 @@ const MainCanvas = () => {
   const pixelCurve = new THREE.CubicBezierCurve(new THREE.Vector2(0,0),new THREE.Vector2(0,1),new THREE.Vector2(0,1),new THREE.Vector2(0,1));
 
   //particle system stuff
-  
+
   let frame = 0
   let geometry = new THREE.BufferGeometry();
   let particleMaterial = new THREE.PointsMaterial()
@@ -93,10 +94,10 @@ const MainCanvas = () => {
   const PARTICLE_COUNT = 3000
 
   let then = 0;
+  let fadeInPercentage = 0;
 
   useEffect(() => {
     texLoader = new THREE.TextureLoader();
-    exrLoader = new EXRLoader();
 
     initScene()
     initSnow()
@@ -104,21 +105,22 @@ const MainCanvas = () => {
     if (controlsOn){  initControls()  }
 
     then = 0;
-
-    //animate()
   }, [])
 
-  const animate = (now) => {
+  const animate = (now = 0) => {
 
     //get delta time
     now *= 0.001;  // make it seconds
-    let delta = now - then;
+    let delta = then ? now - then : 0;
     then = now;
+
+    // fade the splat in after loading; the sobel edge effect fades with it
+    fadeInPercentage = Math.min(1, fadeInPercentage + delta / SPLAT_FADE_IN);
+    splat.opacity = fadeInPercentage;
+
     // update shaders using smoothed scroll position
     scrollPos = THREE.MathUtils.lerp( scrollPos, targetScrollPos, 0.05 );
     // gets clamped time between in and out points
-    //add intro fade in
-    const fadeInPercentage = THREE.MathUtils.clamp(-0.1 + 2* ((viewer.splatMesh.visibleRegionBufferRadius > 0) ? (viewer.splatMesh.visibleRegionFadeStartRadius / viewer.splatMesh.visibleRegionBufferRadius) : 0), 0, 1);
     let sobelTime = THREE.MathUtils.smoothstep( scrollPos, transitions.sobelPosIn, transitions.sobelPosOut )  + (1 - fadeInPercentage)
     // finds that point on the animation curve
     const sobelPos = sobelCurve.getPoint(sobelTime).y
@@ -128,39 +130,31 @@ const MainCanvas = () => {
     const greyscalePos = greyscaleCurve.getPoint(greyscaleTime).y;
     params.greyscaleOpacity = greyscalePos;
 
-    // console.log(pos.toFixed(2), greyscaleTime.toFixed(2), greyscalePos.toFixed(2))
     const pixelTime = THREE.MathUtils.smoothstep(scrollPos, transitions.pixelPosIn, transitions.pixelPosOut)
     const pixelPos = pixelCurve.getPoint(pixelTime).y
     const pixelSize = THREE.MathUtils.mapLinear(pixelPos, 0, 1, 1, 32)
     params.greyscaleOpacity = pixelSize;
-    
+
     effectSobel.uniforms[ 'opacity' ].value = sobelPos;
     effectGrayScale.uniforms[ 'opacity' ].value = greyscalePos;
     effectPixel.uniforms[ "pixelSize" ].value = pixelSize;
 
-    // console.log(scrollPos)
+    if (controlsOn){
+      controls.enable = true
+      controls.update();
+    }
 
-    //turn off if at top
-    viewer.update();
-    //viewer.render(); 
-    //composer.render();
-
+    // the splat renderer updates and sorts automatically on each render
     if (( params.enable === true )){
 
       composer.render();
 
     } else {
 
-      viewer.render(); 
+      renderer.render(scene, camera);
 
     }
 
-
-    if (controlsOn){
-      controls.enable = true
-      controls.update();
-    }
-    //console.log(camera.position)  
     animateSnow()
 
 
@@ -176,8 +170,10 @@ const MainCanvas = () => {
     fogCol = new THREE.Color(0xffffff);
     scene.fog = new THREE.FogExp2(fogCol, 0.00005)
 
-    renderer = new THREE.WebGLRenderer({ antialias: true })
-    //renderer.setAnimationLoop()
+    // gaussian-splat-lite recommends antialias off: MSAA slows splats down
+    // without improving them
+    renderer = new THREE.WebGLRenderer({ antialias: false })
+    renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(w, h)
     renderer.setClearColor('#0000')
     renderer.autoClear = true;
@@ -190,113 +186,65 @@ const MainCanvas = () => {
     pmremGenerator.compileEquirectangularShader();
 
     camera = new THREE.PerspectiveCamera(50, w / h, .1, 50000)
-    const boxColor = 0xBBBBBB;
-    const boxGeometry = new THREE.BoxGeometry(2, 2, 2);
-    const boxMesh = new THREE.Mesh(boxGeometry, new THREE.MeshBasicMaterial({'color': boxColor}));
-    boxMesh.position.set(0, 5, 0);
-    // scene.add(boxMesh);
-    
+
     camera.position.copy(new THREE.Vector3().fromArray([-8.25, 6.6, -22]));
     camera.up = new THREE.Vector3().fromArray([0, 1, 0]).normalize();
     camera.lookAt(new THREE.Vector3().fromArray([-0.5, 6, -0.5]));
 
-   //SPLAT STUFF
-   viewer = new GaussianSplats3D.Viewer({
-      
-    'threeScene': scene,
-    'selfDrivenMode': false,
-    'renderer': renderer,
-    'camera': camera,
-    'useBuiltInControls': false,
-    'ignoreDevicePixelRatio': false,
-    'gpuAcceleratedSort': true,
-    'enableSIMDInSort': true,
-    'sharedMemoryForWorkers': false,
-    'integerBasedSort': false,
-    'halfPrecisionCovariancesOnGPU': true,
-    'dynamicScene': false,
-    'webXRMode': GaussianSplats3D.WebXRMode.None,
-    'renderMode': GaussianSplats3D.RenderMode.OnChange,
-    'sceneRevealMode': GaussianSplats3D.SceneRevealMode.Gradual,
-    'antialiased': true,
-    'focalAdjustment': 1.0,
-    'logLevel': GaussianSplats3D.LogLevel.None,
-    'sphericalHarmonicsDegree': 0,
-    'enableOptionalEffects': false,
-    'plyInMemoryCompressionLevel': 2,
-    'freeIntermediateSplatData': false
-});
-scene.add(viewer.splatMesh)
-
     // postprocessing
 
-    composer = new EffectComposer( viewer.renderer );
-    //const scenePass = new RenderPass( scene, camera );
-    //composer.addPass( scenePass );
-
-    // const splatPass = new RenderPass(viewer.splatMesh, camera);
-    // composer.addPass(splatPass);
-
-
-
-    // effect1 = new ShaderPass( DotScreenShader );
-    // effect1.uniforms['scale'].value = 4
-		// composer.addPass( effect1 );
+    composer = new EffectComposer( renderer );
 
     // color to grayscale conversion
-
     effectGrayScale = new ShaderPass( LuminosityShaderWithOpacity );
     effectGrayScale.uniforms[ 'opacity' ].value = 1//params.greyscaleOpacity;
 
-    //composer.addPass( effectGrayScale );
-
-    // you might want to use a gaussian blur filter before
-    // the next pass to improve the result of the Sobel operator
-
     // Sobel operator
-
     effectSobel = new ShaderPass( SobelWithOpacity );
     effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
     effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
     effectSobel.uniforms[ 'opacity' ].value = params.sobelOpacity;
-    // composer.addPass( effectSobel );
 
     effectPixel = new ShaderPass( PixelShader );
     effectPixel.uniforms[ "resolution" ].value = new THREE.Vector2( window.innerWidth, window.innerHeight );
     effectPixel.uniforms[ "resolution" ].value.multiplyScalar( window.devicePixelRatio );
-    // composer.addPass( effectPixel );
 
- 
-
-    //skyBoxTex = exrLoader.load( '/textures/Skybox2k_zip.exr'); 
-    skyBoxBGTex = texLoader.load( '/textures/MtTildeSkybox.png');
-  
-    viewer.addSplatScene('mttilde_postshot_cleaned.splat', {
-      'format': GaussianSplats3D.SceneFormat.Splat,
-      'rotation': [0, 0, 0, 0],
-      'scale': [1, -1, 1],
-      'position': [0, 0, 0],
-      'progressiveLoad':true,
-      'showLoadingUI':false
-    })
-    .then(() => {
-      //renderer.setAnimationLoop( animate );
-       animate()
-    });
-
-    // viewer.addSplatScene("mttilde_postshot_cleaned.splat")
-    // .then(() => {
-    //     viewer.start();
-    // });
-   
     window.addEventListener('resize', () => {
       resize(threeElement)
     })
-    // window.addEventListener( 'mousemove', onMouseMove, false );
 
     window.addEventListener('scroll', handleScroll)
 
+    loadScene()
+  }
 
+  //SPLAT STUFF
+  const loadScene = async () => {
+    // Imported here (browser only) so Gatsby's server-side render never
+    // evaluates the library.
+    const { GaussianSplatRenderer, SplatMesh } = await import('gaussian-splat-lite')
+
+    // encodeLinear: false keeps the splat colours in sRGB, matching how the
+    // skybox and the (OutputPass-free) post-processing chain handle colour.
+    splatRenderer = new GaussianSplatRenderer({ renderer, encodeLinear: false })
+    scene.add(splatRenderer)
+
+    splat = new SplatMesh({ url: SPLAT_URL, maxSh: 0 })
+    splat.matrixAutoUpdate = false
+    splat.matrix.compose(SPLAT_POSITION, SPLAT_ROTATION, SPLAT_SCALE)
+    splat.opacity = 0
+    scene.add(splat)
+
+    const skyLoad = texLoader.loadAsync('/textures/MtTildeSkybox.png')
+
+    try {
+      const [skyTex] = await Promise.all([skyLoad, splat.initialized])
+      skyBoxBGTex = skyTex
+      onSceneLoaded()
+      animate()
+    } catch (error) {
+      console.log('There was an error loading the scene', error)
+    }
   }
 
   const initControls = () => {
@@ -308,73 +256,65 @@ scene.add(viewer.splatMesh)
     controls.screenSpacePanning = false
     controls.enableZoom = false
 
-    // controls.minDistance = 100
-    // controls.maxDistance = 200
-
     controls.maxPolarAngle = Math.PI / 2.2
     controls.panSpeed = 1
-    //controls.target = shape.position
-    //camera.position.set(camPosHome)
-    // camera.lookAt(camPos1)
-
-    // camera.rotation.set(0.11984934600336096, -6.12323399573676, -0.992792090149074)
     controls.update()
-    
+
   }
 
   const initSnow = () => {
     // Load the snowflake texture
     var snowflakeTexture = texLoader.load('/textures/snowflake.png');
-  
+
     // Define constants
     const x = 40;
     const y = 50;
     const z = 40;
-  
+
     // Create an array to hold the positions of the particles
     const positions = new Float32Array(PARTICLE_COUNT * 3);
     const velocities = new Float32Array(PARTICLE_COUNT * 3);
-  
+
     // Initialize the particle positions and velocities
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       positions[i * 3] = Math.random() * x - x / 2;
       positions[i * 3 + 1] = Math.random() * y - y / 2;
       positions[i * 3 + 2] = Math.random() * z - z / 2;
-  
+
       velocities[i * 3] = 3;
       velocities[i * 3 + 1] = -0.2;
       velocities[i * 3 + 2] = 0;
     }
-  
+
     // Create a BufferGeometry and set the positions attribute
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
 
-  
+
     // Create the particle material
-    const particleMaterial = new THREE.PointsMaterial({ 
+    const particleMaterial = new THREE.PointsMaterial({
       color: '#FFF',
       map: snowflakeTexture,
       size: 0.05,
       blending: THREE.AdditiveBlending,
       transparent: true
     });
-  
+
     // Create the particle system
     particleSystem = new THREE.Points(geometry, particleMaterial);
     particleSystem.position.set(0, 0, 0);
     scene.add(particleSystem);
   };
-  
+
   const animateSnow = () => {
     // Update the rotation of the particle system
     particleSystem.rotation.y = -frame / 200;
-  
+
     // Get the position and velocity attributes and their arrays
     const positions = particleSystem.geometry.attributes.position.array;
     const velocities = particleSystem.geometry.attributes.velocity.array;
-  
+
     // Update the positions of the particles
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       if (positions[i * 3 + 1] < -10) {
@@ -382,14 +322,14 @@ scene.add(viewer.splatMesh)
       }
       positions[i * 3 + 1] += velocities[i * 3 + 1] / 7;
     }
-  
+
     // Mark the position attribute as needing an update
     particleSystem.geometry.attributes.position.needsUpdate = true;
-  
+
     // Increment the frame counter
     frame++;
   };
-  
+
   const resize = (threeElement) => {
     let w = threeElement.current.clientWidth
     let h = threeElement.current.clientHeight
@@ -405,82 +345,41 @@ scene.add(viewer.splatMesh)
     camera.updateProjectionMatrix()
   }
 
-  const handleScroll = () => { 
+  const handleScroll = () => {
     targetScrollPos = getVerticalScrollNormalised(document.body)
-    // console.log("target pos: "+targetScrollPos.toFixed(3) + ", lerped pos: "+scrollPos.toFixed(3));
   }
-  
+
   const getVerticalScrollNormalised = ( elm ) => {
     var p = elm.parentNode
     return (elm.scrollTop || p.scrollTop) / (p.scrollHeight - p.clientHeight )
   }
 
 
-  
+
   function onTransitionEnd( event ) {
 
     event.target.remove();
-    
-  } 
+
+  }
 
   //LOADING
 
-  THREE.DefaultLoadingManager.onLoad = function ( ) {
-  
-    console.log( 'Loading Complete!');
-    //skyBoxTex.rotation = Math.PI;
-    //const env = pmremGenerator.fromEquirectangular( skyBoxTex ).texture;
+  const onSceneLoaded = () => {
     skyBoxBGTex.rotation = Math.PI;
     const BGenv = pmremGenerator.fromEquirectangular( skyBoxBGTex ).texture;
-    //scene.background = BGenv;
-    viewer.renderer.autoClear = true
-    const splatPass = new RenderPass(scene, camera);
-    
-    //const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera);
-   // outlinePass.renderToScreen = true;
-    // splatPass.renderToScreen = false;
-
-    // outlinePass.selectedObjects = selectedObjects;
-    
     scene.background = BGenv;
-    const skyPass = new RenderPass(scene, camera);
 
-    composer.addPass( skyPass)
-
-    composer.addPass( splatPass)
-
-   // composer.addPass(outlinePass)
-
+    composer.addPass( new RenderPass(scene, camera) )
     composer.addPass( effectSobel );
     composer.addPass( effectPixel );
 
     pmremGenerator.dispose();
 
     loadingscreen.classList.add( 'fade-out' );
-		
+
 		// optional: remove loader from DOM via event listener
 		loadingscreen.addEventListener( 'transitionend', onTransitionEnd );
-    
-    };
-
-  THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
-
-    // console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
-  
-  };
-    
-  
-  THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
-  
-    // console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
-  
-  };
-  
-  THREE.DefaultLoadingManager.onError = function ( url ) {
-  
-    console.log( 'There was an error loading ' + url );
-  
-  };
+  }
 
   return <div>
   <StyledDiv className="App" ref={threeElement}>
@@ -494,15 +393,3 @@ scene.add(viewer.splatMesh)
 }
 
 export default MainCanvas
-
-//create loading screen
-// loadingscreen = document.createElement('section')
-// loadingscreen.className = 'loading-screen'
-// threeElement.current.appendChild(loadingscreen)
-// var loadingscreenicon = document.createElement('div')
-// loadingscreenicon.className = 'loader'
-// loadingscreen.appendChild(loadingscreenicon)
-// var svg = document.createElement('img')
-// svg.classList = 'svg-icon'
-// svg.src = '/tilde-logo.svg'
-// loadingscreenicon.appendChild(svg)

@@ -13,6 +13,7 @@ import styled from "styled-components";
 
 import MainCanvas from "../common/GaussianCanvas";
 import MobileCanvas from "../common/MobileCanvas";
+import HeroTitle from "../common/HeroTitle";
 
 
 import AOS from "aos";
@@ -29,8 +30,11 @@ const seo = {
 };
 
 const Blank = styled.section `
+position: relative;
 width: 100%;
 height: 100vh;
+/* let mouse/touch through to the three.js canvas behind (orbit controls) */
+pointer-events: none;
 `
 
 const Blank2 = styled.section `
@@ -50,6 +54,7 @@ display: block;
 color: white;
 text-decoration:none;
 font-size: 60px;
+pointer-events: auto;
 /* border: solid white; */
 /* border-width: 0 2px 2px 0; */
 /* transform: rotate(45deg);  */
@@ -117,7 +122,7 @@ return (
           }
     </>
 
-    <Blank><ArrowDown to="/#work-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
+    <Blank><HeroTitle /><ArrowDown to="/#work-header" data-aos="fade-up" data-aos-mirror="true" >˅</ArrowDown></Blank>
     <Work />
     <Blank2 />
     <About />

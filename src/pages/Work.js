@@ -75,12 +75,14 @@ const Work = () => {
     { title: "Under Waters", imageUrl: "media/_Art/Under Waters/S1_2026_Under Waters_Exhibtion Documentation_Guy Louden_Web-5.jpg", link: "/under-waters", linkText: "", category: "art" },
     { title: "Terracotta Warriors", imageUrl: "media/_Art/Terracotta Warriors/terracotta-warriors-hres.gif", link: "/terracotta-warriors", linkText: "", category: "art" },
     { title: "kajoo yannaga", imageUrl: "media/_Art/kajoo yannaga/kajoo+yannaga_image+edit_+AprilPhillips_2024_credit_JacquieManning-24_V2.webp", link: "/kajoo-yannaga", linkText: "", category: "art" },
+    { title: "LOOK ▷ SEE", imageUrl: "media/_Art/LOOK SEE/look-see-1m03s.jpg", link: "/look-see", linkText: "", category: "art" },
 
     { title: "RÜFÜS DU SOL Coachella", imageUrl: "media/_Music/Rufus/Coachella/Copy of Coachella_24_JORGPHOTO_20240419_191900_4318.jpg", link: "/RDS-Coachella/", linkText: " ", category: "music" },
     { title: "RÜFÜS DU SOL Surrender", imageUrl: "media/_Music/Rufus/Surrender Tour/RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/RDS-Surrender/", linkText: "RÜFÜS DU SOL Surrender", category: "music" },
     { title: "RÜFÜS DU SOL Atlas 10 Years", imageUrl: "media/_Music/Rufus/Surrender Tour/221202_MitchLowePhoto_RUFUSDUSOL-4-scaled.png", link: "/RDS-Atlas/", linkText: "RÜFÜS DU SOL Atlas 10 Years", category: "music" },
 
     // { title: "Flight Facility Product Renders", imageUrl: "RUFUS+DU+SOL_Red+Rocks_20221016_FM_128_Forrest Mondlane Jr..jpg", link: "/FLightFacility/", linkText: " ", category: "music" },
+    { title: "VAD - A Minecraft Movie", imageUrl: "media/_Virtual Production/Minecraft/minecraft-movie-vad-showreel.png", link: "/minecraft-movie", linkText: "", category: "virtual-production" },
     { title: "VAD - Thor Love & Thunder", imageUrl: "media/_Virtual Production/VAD/thor_1.png", link: "/VAD-thor", linkText: "", category: "virtual-production" },
     { title: "Box Of Birds - Shipwreck Odyssey", imageUrl: "media/_Virtual Production/ShipwreckOdyssey/ShipwreckOdyssey_DressRehearsal_ANMM_Credit_CassandraHannagan-65.jpg", link: "/Shipwreck-Odyssey", linkText: "", category: "art" },
     { title: "Air Force Capability Visualisation", imageUrl: "media/_Other/Airforce/aspc_1.jpg", link: "/aspc", linkText: "", category: "art" },

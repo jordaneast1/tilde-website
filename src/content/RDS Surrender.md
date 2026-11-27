@@ -7,8 +7,6 @@ subtitle: "Motion Graphics"
 <!---
 slug: must match link: URL in .Work.js
 -->
-<img src='/gifs/RDS_compressed.gif' alt='RÜFÜS DU SOL Surrender visuals' width='100%'>
-
 <p>Working alongside Pat Younis as Tilde Visual for the Rufus Du Sol ‘Surrender’ album and tour. We created content for their massive LED screen set up for the live show over ‘22 and ‘23, and YouTube visualizers for their album launch.</p>
 
 <img src='../images/media/_Music/Rufus/Surrender Tour/jordaneast/surrender-01.jpg' alt='RÜFÜS DU SOL Surrender live show'>
